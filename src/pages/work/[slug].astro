@@ -1,0 +1,116 @@
+---
+import { originOf } from '@/config/urls';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import VideoLoop from '@/components/VideoLoop.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { projects, type Project } from '@/data/projects';
+import { getService } from '@/data/services';
+
+export function getStaticPaths() {
+  return projects.map((project, i) => ({
+    params: { slug: project.slug },
+    props: { project, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+interface Props { project: Project; next: Project }
+const { project, next } = Astro.props;
+const origin = originOf(Astro.site!);
+const serviceSlug = { animation: '3d-product-animation', visualization: 'product-visualization', design: 'product-industrial-design' }[project.service];
+const service = getService(serviceSlug)!;
+const main = project.media[0];
+
+const frameFor = (aspect: string) =>
+  aspect === 'portrait' ? 'aspect-[9/16] h-[min(80vh,56rem)] max-w-full' : aspect === 'cinema' ? 'aspect-[992/432]' : 'aspect-video';
+
+const schema = project.media.map((m) => ({
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: `${project.title} — ${project.type}${m.label ? ` (${m.label})` : ''}`,
+  description: project.seoDescription,
+  thumbnailUrl: [`${origin}/media/posters/${m.name}.jpg`],
+  contentUrl: `${origin}/media/video/${m.name}.mp4`,
+  uploadDate: '2026-09-28', // TODO: set real publish date per project
+  duration: m.duration,
+  width: m.width,
+  height: m.height,
+  creator: { '@id': `${origin}/#person` },
+}));
+---
+
+<BaseLayout
+  title={project.seoTitle}
+  description={project.seoDescription}
+  image={`/media/posters/${main.name}.jpg`}
+  type="video.other"
+  breadcrumbs={[{ name: 'Work', href: '/work/' }, { name: project.title, href: `/work/${project.slug}/` }]}
+  schema={schema}
+>
+  <link slot="head" rel="preload" as="image" href={`/media/posters/${main.name}.webp`} fetchpriority="high" />
+
+  <article>
+    <header class="container-x pt-32 sm:pt-40">
+      <nav aria-label="Breadcrumb" class="text-sm text-ink-soft" data-reveal>
+        <a href="/work/" class="link-underline">Work</a> <span class="mx-2 text-ink-faint">/</span> <span>{project.title}</span>
+      </nav>
+      <div class="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-8">
+          <p class="eyebrow" data-reveal>{project.number} — {project.type}</p>
+          <h1 class="mt-5 font-display text-[clamp(2.75rem,7vw,6.5rem)] font-medium leading-[0.95] tracking-[-0.03em]" data-reveal>{project.title}</h1>
+        </div>
+        <p class="prose-body lg:col-span-4" data-reveal>{project.summary}</p>
+      </div>
+    </header>
+
+    <div class="container-x mt-12 space-y-6">
+      {project.media.map((m, i) => (
+        <figure data-reveal>
+          <div class:list={['overflow-hidden rounded-[1.5rem] bg-night', m.aspect === 'portrait' && 'flex justify-center sm:py-10']}>
+            <div class={frameFor(m.aspect)}>
+              <VideoLoop full name={m.name} label={`${project.title} — ${project.type}${m.label ? `, ${m.label}` : ''}`} width={m.width} height={m.height} />
+            </div>
+          </div>
+          {m.label && <figcaption class="mt-3 text-sm text-ink-soft">{m.label}</figcaption>}
+        </figure>
+      ))}
+    </div>
+
+    <section class="container-x grid gap-12 py-20 sm:py-28 lg:grid-cols-12" aria-label="Project details">
+      <dl class="grid h-fit grid-cols-2 gap-6 rounded-[1.5rem] bg-surface p-7 ring-1 ring-line lg:col-span-4 lg:grid-cols-1" data-reveal>
+        <div><dt class="text-xs uppercase tracking-[0.16em] text-ink-faint">Service</dt><dd class="mt-1.5"><a href={`/services/${service.slug}/`} class="link-underline font-medium">{service.title}</a></dd></div>
+        <div><dt class="text-xs uppercase tracking-[0.16em] text-ink-faint">Industry</dt><dd class="mt-1.5 font-medium">{project.industry}</dd></div>
+        <div><dt class="text-xs uppercase tracking-[0.16em] text-ink-faint">Formats</dt><dd class="mt-1.5 font-medium">{project.formats.join(' · ')}</dd></div>
+        <div class="col-span-2 lg:col-span-1">
+          <dt class="text-xs uppercase tracking-[0.16em] text-ink-faint">Deliverables</dt>
+          <dd class="mt-3 flex flex-wrap gap-2">{project.deliverables.map((d) => <span class="rounded-full bg-gold-pale px-3 py-1 text-sm">{d}</span>)}</dd>
+        </div>
+      </dl>
+
+      <div class="space-y-12 lg:col-span-7 lg:col-start-6">
+        {[
+          ['The challenge', project.challenge],
+          ['The approach', project.approach],
+          ['The result', project.result],
+        ].map(([h, t]) => (
+          <div data-reveal>
+            <h2 class="font-display text-3xl font-medium">{h}</h2>
+            <p class="prose-body mt-4">{t}</p>
+          </div>
+        ))}
+        <a href="/contact/" class="btn btn-gold" data-reveal>Start a similar project <Icon name="arrow" class="arrow size-4" /></a>
+      </div>
+    </section>
+  </article>
+
+  <section class="container-x border-t border-line pt-16" aria-labelledby="next-title">
+    <p class="eyebrow">Next project</p>
+    <h2 id="next-title" class="sr-only">Next project</h2>
+    <div class="mt-8 max-w-xl">
+      <ProjectCard project={next} mediaIndex={next.media.length > 1 ? 1 : 0} frameClass="aspect-[16/10]" />
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>

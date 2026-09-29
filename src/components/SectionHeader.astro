@@ -1,0 +1,11 @@
+---
+interface Props { eyebrow: string; title: string; intro?: string; class?: string; id?: string; as?: 'h1' | 'h2' }
+const { eyebrow, title, intro, class: cls = '', id, as: H = 'h2' } = Astro.props;
+---
+
+<div class:list={['max-w-3xl', cls]} data-reveal>
+  <p class="eyebrow">{eyebrow}</p>
+  <H id={id} class="mt-5 font-display text-4xl font-medium leading-[1.05] sm:text-5xl lg:text-6xl">{title}</H>
+  {intro && <p class="prose-body mt-6 max-w-2xl">{intro}</p>}
+  <slot />
+</div>

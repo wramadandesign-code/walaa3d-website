@@ -1,0 +1,213 @@
+---
+import { originOf } from '@/config/urls';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import VideoLoop from '@/components/VideoLoop.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Faq from '@/components/Faq.astro';
+import Icon from '@/components/Icon.astro';
+import { projects } from '@/data/projects';
+import { services, process, generalFaqs } from '@/data/services';
+import { site } from '@/config/site';
+
+const [p1, p2, p3, p4, p5, p6] = projects;
+const hero = p1.media[0];
+const origin = originOf(Astro.site!);
+
+const capabilities = ['Product Commercials', 'Product Reveals', 'Exploded Views', 'Mechanism Animation', 'Feature Animation', 'Social-Media Videos', 'Launch Films', 'Photoreal Renders'];
+
+const pillars = [
+  { title: 'Product understanding', text: 'An industrial-design background means I read CAD, materials and mechanisms like a designer — so every shot is accurate and highlights what matters.' },
+  { title: '3D visualization', text: 'Every film starts from a precise 3D model with real-world materials and lighting. The same model powers animations, stills and variants.' },
+  { title: 'AI-assisted workflow', text: 'Carefully selected AI tools speed up animation and compositing — faster turnarounds without compromising the product itself.' },
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${origin}/#website`,
+    url: `${origin}/`,
+    name: site.brand,
+    publisher: { '@id': `${origin}/#business` },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Selected 3D product animation projects',
+    itemListElement: projects.map((pr, i) => ({ '@type': 'ListItem', position: i + 1, url: `${origin}/work/${pr.slug}/`, name: pr.title })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: generalFaqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  },
+];
+---
+
+<BaseLayout schema={schema}>
+  <link slot="head" rel="preload" as="image" href={`/media/posters/${hero.name}.webp`} fetchpriority="high" />
+
+  <!-- HERO -->
+  <section class="container-x pt-32 sm:pt-40" aria-labelledby="hero-title">
+    <div class="grid items-end gap-10 lg:grid-cols-12">
+      <div class="lg:col-span-8">
+        <p class="eyebrow" data-reveal>3D Product Animation &amp; Visualization</p>
+        <h1 id="hero-title" class="mt-6 font-display text-[clamp(3rem,9vw,8.5rem)] font-medium leading-[0.92] tracking-[-0.035em]" data-reveal style="--reveal-delay:80ms">
+          Bring Your Product <span class="italic font-light text-gold-deep">to Life</span> in 3D
+        </h1>
+      </div>
+      <div class="lg:col-span-4 lg:pb-3" data-reveal style="--reveal-delay:180ms">
+        <p class="prose-body">
+          Cinematic 3D product animation and product visualization for launches, marketing, social media and digital campaigns — for brands, startups and manufacturers.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/work/" class="btn btn-gold">Explore Projects <Icon name="arrow" class="arrow size-4" /></a>
+          <a href="/contact/" class="btn btn-ghost">Start a Project</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative mt-12 overflow-hidden rounded-[1.75rem] bg-night sm:mt-16" data-reveal style="--reveal-delay:260ms">
+      <div class="aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]">
+        <VideoLoop name={hero.name} label={`${p1.title} — 3D product animation showreel`} eager width={hero.width} height={hero.height} />
+      </div>
+      <a href={`/work/${p1.slug}/`} class="group absolute bottom-4 left-4 right-4 flex items-center justify-between gap-4 rounded-2xl bg-canvas/85 p-3 pl-5 backdrop-blur-md sm:bottom-6 sm:left-6 sm:right-auto sm:min-w-[22rem]">
+        <span>
+          <span class="block text-[0.7rem] uppercase tracking-[0.16em] text-ink-soft">Featured · {p1.type}</span>
+          <span class="font-display text-lg font-medium">{p1.title}</span>
+        </span>
+        <span class="grid size-10 place-items-center rounded-full bg-gold transition-transform duration-500 ease-out-expo group-hover:rotate-45"><Icon name="arrow-up-right" class="size-5" /></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- CAPABILITIES MARQUEE -->
+  <div class="marquee mt-16 overflow-hidden border-y border-line py-6 sm:mt-24" aria-label="Capabilities">
+    <div class="marquee-track flex w-max gap-12 whitespace-nowrap">
+      {[...capabilities, ...capabilities].map((c, i) => (
+        <span class="flex items-center gap-12 font-display text-2xl font-light text-ink-soft sm:text-3xl" aria-hidden={i >= capabilities.length ? 'true' : undefined}>
+          {c}<span class="size-2 rotate-45 bg-gold" aria-hidden="true"></span>
+        </span>
+      ))}
+    </div>
+  </div>
+
+  <!-- INTRO STATEMENT -->
+  <section class="container-x grid gap-10 py-24 sm:py-32 lg:grid-cols-12" aria-labelledby="intro-title">
+    <p class="eyebrow lg:col-span-3" data-reveal>Product animation studio</p>
+    <div class="lg:col-span-9">
+      <h2 id="intro-title" class="font-display text-3xl font-normal leading-[1.15] sm:text-5xl" data-reveal>
+        Products are hard to explain in a photo. <span class="text-ink-faint">In motion, they sell themselves — every surface, feature and mechanism, exactly as designed.</span>
+      </h2>
+      <div class="mt-10 grid gap-8 sm:grid-cols-2" data-reveal>
+        <p class="prose-body">I create cinematic 3D product animations and product visualizations for brands, startups and manufacturers — from a short social teaser to a full product launch film.</p>
+        <p class="prose-body">Send a CAD file, photos or even sketches. No physical sample needed: your product can be on screen before it is on the shelf.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SELECTED WORK -->
+  <section id="work" class="container-x pb-12" aria-labelledby="work-title">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <SectionHeader eyebrow="Selected work" title="Products brought to life" id="work-title" />
+      <a href="/work/" class="btn btn-ghost" data-reveal>View all work <Icon name="arrow" class="arrow size-4" /></a>
+    </div>
+
+    <div class="mt-14 grid gap-x-8 gap-y-14 md:grid-cols-12">
+      <ProjectCard project={p1} mediaIndex={1} class="md:col-span-6 lg:col-span-5" />
+      <ProjectCard project={p2} class="md:col-span-6 lg:col-span-5 lg:col-start-8 lg:mt-40" />
+      <ProjectCard project={p5} class="md:col-span-12 lg:col-span-7" frameClass="aspect-[16/10]" />
+      <ProjectCard project={p3} class="md:col-span-6 lg:col-span-4 lg:col-start-9 lg:mt-24" />
+      <ProjectCard project={p4} class="md:col-span-6 lg:col-span-4" />
+      <ProjectCard project={p6} class="md:col-span-12 lg:col-span-7 lg:col-start-6 lg:mt-32" frameClass="aspect-[16/10]" />
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services" class="mt-20 bg-mist/60 py-24 sm:py-32" aria-labelledby="services-title">
+    <div class="container-x">
+      <SectionHeader eyebrow="Services" title="What I create for your product" id="services-title" intro="3D product animation is at the heart of everything — supported by photoreal visualization and a background in industrial design." />
+
+      <div class="mt-14 grid gap-5 lg:grid-cols-12">
+        {services.map((s, i) => (
+          <a
+            href={`/services/${s.slug}/`}
+            class:list={[
+              'group relative flex flex-col overflow-hidden rounded-[1.5rem] p-8 ring-1 transition-all duration-500 ease-out-expo hover:-translate-y-1 sm:p-10',
+              s.primary ? 'bg-ink text-canvas ring-ink lg:col-span-7 lg:row-span-2' : 'bg-surface ring-line hover:ring-gold lg:col-span-5',
+            ]}
+            data-reveal
+            style={`--reveal-delay:${i * 90}ms`}
+          >
+            <div class="flex items-start justify-between gap-6">
+              <span class:list={['grid size-12 place-items-center rounded-full', s.primary ? 'bg-gold text-ink' : 'bg-gold-pale text-gold-deep']}>
+                <Icon name={s.icon} class="size-6" />
+              </span>
+              <span class:list={['text-xs uppercase tracking-[0.16em]', s.primary ? 'text-gold' : 'text-ink-faint']}>{s.kicker}</span>
+            </div>
+            <h3 class:list={['mt-10 font-display font-medium leading-tight', s.primary ? 'text-4xl sm:text-5xl' : 'text-3xl']}>{s.title}</h3>
+            <p class:list={['mt-4 max-w-xl leading-relaxed', s.primary ? 'text-canvas/70' : 'text-ink-soft']}>{s.short}</p>
+            {s.primary && (
+              <ul class="mt-10 grid gap-x-6 gap-y-3 border-t border-canvas/15 pt-8 sm:grid-cols-2">
+                {s.includes.map((inc) => (
+                  <li class="flex items-center gap-3 text-sm text-canvas/85"><Icon name="check" class="size-4 text-gold" />{inc.title}</li>
+                ))}
+              </ul>
+            )}
+            <span class:list={['mt-auto inline-flex items-center gap-2 pt-10 text-sm font-medium', s.primary ? 'text-gold' : 'text-ink']}>
+              Learn more <Icon name="arrow" class="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY WORK WITH ME -->
+  <section class="container-x grid gap-14 py-24 sm:py-32 lg:grid-cols-12 lg:items-center" aria-labelledby="why-title">
+    <div class="relative lg:col-span-5" data-reveal>
+      <div class="aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-night">
+        <VideoLoop name={p3.media[0].name} label="Exploded view of a smart device — 3D product animation" width={720} height={1280} />
+      </div>
+      <div class="absolute -bottom-6 -right-2 max-w-[15rem] rounded-2xl bg-surface p-5 shadow-xl ring-1 ring-line sm:-right-6">
+        <p class="font-display text-lg font-medium leading-snug">Product understanding + 3D visualization + AI-assisted animation</p>
+      </div>
+    </div>
+    <div class="lg:col-span-6 lg:col-start-7">
+      <SectionHeader eyebrow="Why work with me" title="More than animation. I understand products." id="why-title" intro="With a background in industrial design, I approach product animation from both a visual and product-development perspective. I combine 3D design, visualization and AI-assisted workflows to create engaging product content." />
+      <ol class="mt-10 divide-y divide-line border-y border-line">
+        {pillars.map((pl, i) => (
+          <li class="grid gap-2 py-6 sm:grid-cols-[3rem_1fr]" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <span class="font-display text-sm text-gold-deep">0{i + 1}</span>
+            <div>
+              <h3 class="font-display text-xl font-medium">{pl.title}</h3>
+              <p class="mt-2 leading-relaxed text-ink-soft">{pl.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process" class="border-t border-line bg-surface py-24 sm:py-32" aria-labelledby="process-title">
+    <div class="container-x">
+      <SectionHeader eyebrow="Process" title="From CAD file to final film" id="process-title" intro="A clear, collaborative process — you always know what happens next." />
+      <ol class="mt-16 grid gap-px overflow-hidden rounded-[1.5rem] bg-line ring-1 ring-line sm:grid-cols-2 lg:grid-cols-5">
+        {process.map((st, i) => (
+          <li class="flex flex-col bg-surface p-7 transition-colors duration-500 hover:bg-gold-pale" data-reveal style={`--reveal-delay:${i * 70}ms`}>
+            <span class="font-display text-5xl font-light text-gold-deep">{st.n}</span>
+            <h3 class="mt-10 font-display text-2xl font-medium">{st.title}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-ink-soft">{st.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <Faq items={generalFaqs} />
+
+  <CtaBand />
+</BaseLayout>

@@ -1,0 +1,26 @@
+---
+import Icon from './Icon.astro';
+import { site, whatsappUrl } from '@/config/site';
+interface Props { title?: string; text?: string }
+const { title = 'Have a product you want to bring to life?', text = "Let's create something remarkable." } = Astro.props;
+const wa = whatsappUrl();
+---
+
+<section class="container-x py-20 sm:py-28" aria-labelledby="cta-title">
+  <div class="relative overflow-hidden rounded-[2rem] bg-surface px-6 py-16 text-center ring-1 ring-line sm:px-12 sm:py-24" data-reveal>
+    <div class="pointer-events-none absolute -top-40 left-1/2 size-[36rem] -translate-x-1/2 rounded-full bg-gold-pale blur-3xl" aria-hidden="true"></div>
+    <div class="relative">
+      <p class="eyebrow justify-center">Start a project</p>
+      <h2 id="cta-title" class="mx-auto mt-6 max-w-3xl font-display text-4xl font-medium leading-[1.05] sm:text-6xl">{title}</h2>
+      <p class="prose-body mx-auto mt-5 max-w-xl">{text}</p>
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a href="/contact/" class="btn btn-gold">Start a Project <Icon name="arrow" class="arrow size-4" /></a>
+        {wa ? (
+          <a href={wa} target="_blank" rel="noopener" class="btn btn-ghost"><Icon name="whatsapp" class="size-4" /> Chat on WhatsApp</a>
+        ) : (
+          <a href={`mailto:${site.contact.email}`} class="btn btn-ghost"><Icon name="mail" class="size-4" /> {site.contact.email}</a>
+        )}
+      </div>
+    </div>
+  </div>
+</section>

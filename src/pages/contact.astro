@@ -1,0 +1,53 @@
+---
+import { originOf } from '@/config/urls';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ContactForm from '@/components/ContactForm.astro';
+import Icon from '@/components/Icon.astro';
+import { site, whatsappUrl } from '@/config/site';
+import { process } from '@/data/services';
+
+const wa = whatsappUrl();
+const origin = originOf(Astro.site!);
+const schema = [{ '@context': 'https://schema.org', '@type': 'ContactPage', name: 'Start a Project', url: `${origin}/contact/`, about: { '@id': `${origin}/#business` } }];
+---
+
+<BaseLayout
+  title="Start a Project — Get a Quote"
+  description="Get a quote for 3D product animation or product visualization. Send CAD files, photos or references — working with brands and manufacturers worldwide."
+  breadcrumbs={[{ name: 'Contact', href: '/contact/' }]}
+  schema={schema}
+>
+  <section class="container-x grid gap-14 pb-24 pt-36 sm:pt-44 lg:grid-cols-12">
+    <div class="lg:col-span-5">
+      <p class="eyebrow" data-reveal>Start a project</p>
+      <h1 class="mt-5 font-display text-5xl font-medium leading-[1] sm:text-7xl" data-reveal>Let's create something remarkable.</h1>
+      <p class="prose-body mt-6 max-w-md" data-reveal>Have a product you want to bring to life? Share a few details and you'll receive a clear proposal and quote.</p>
+
+      <div class="mt-10 space-y-3" data-reveal>
+        <a href={`mailto:${site.contact.email}`} class="flex items-center gap-4 rounded-2xl bg-surface p-4 ring-1 ring-line transition-all hover:ring-gold">
+          <span class="grid size-11 place-items-center rounded-full bg-gold-pale text-gold-deep"><Icon name="mail" /></span>
+          <span><span class="block text-xs uppercase tracking-[0.14em] text-ink-faint">Email</span><span class="font-medium">{site.contact.email}</span></span>
+        </a>
+        {wa && (
+          <a href={wa} target="_blank" rel="noopener" class="flex items-center gap-4 rounded-2xl bg-surface p-4 ring-1 ring-line transition-all hover:ring-gold">
+            <span class="grid size-11 place-items-center rounded-full bg-gold-pale text-gold-deep"><Icon name="whatsapp" /></span>
+            <span><span class="block text-xs uppercase tracking-[0.14em] text-ink-faint">WhatsApp</span><span class="font-medium">Chat directly</span></span>
+          </a>
+        )}
+      </div>
+
+      <div class="mt-12 hidden lg:block" data-reveal>
+        <h2 class="eyebrow">What happens next</h2>
+        <ol class="mt-6 space-y-4">
+          {process.slice(0, 3).map((st) => (
+            <li class="flex gap-4"><span class="font-display text-sm text-gold-deep">{st.n}</span><span class="text-sm text-ink-soft"><strong class="font-medium text-ink">{st.title}.</strong> {st.text}</span></li>
+          ))}
+        </ol>
+      </div>
+    </div>
+
+    <div class="rounded-[1.75rem] bg-surface/70 p-6 ring-1 ring-line sm:p-10 lg:col-span-7" data-reveal>
+      <ContactForm />
+    </div>
+  </section>
+</BaseLayout>

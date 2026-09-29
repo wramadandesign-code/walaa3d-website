@@ -1,0 +1,16 @@
+---
+interface Props { class?: string; tagline?: boolean }
+const { class: cls = '', tagline = true } = Astro.props;
+---
+
+<span class:list={['inline-flex items-center gap-3', cls]}>
+  <svg viewBox="0 0 48 48" fill="none" class="size-9 shrink-0" aria-hidden="true">
+    <path d="M24 3 42 13.5 24 24 6 13.5Z" class="fill-gold" />
+    <path d="M24 3 42 13.5v21L24 45 6 34.5v-21Z" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" />
+    <path d="M6 13.5 15 39.75 24 24l9 15.75 9-26.25" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" />
+  </svg>
+  <span class="flex flex-col leading-none">
+    <span class="font-display text-[1.15rem] font-semibold tracking-[0.14em]">WALAA<span class="ml-1.5 text-gold-deep">3D</span></span>
+    {tagline && <span class="mt-1 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-ink-soft">Product Animation</span>}
+  </span>
+</span>

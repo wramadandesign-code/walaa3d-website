@@ -1,0 +1,132 @@
+---
+import Icon from './Icon.astro';
+import { site } from '@/config/site';
+import { abs } from '@/config/urls';
+
+const thankYou = abs(Astro.site!, '/thank-you/');
+const needs = ['3D Product Animation', 'Product Visualization / Renders', 'Exploded View', 'Mechanism Animation', 'Social-Media Videos', 'Product & Industrial Design'];
+const lengths = ['Under 15 seconds', '15–30 seconds', '30–60 seconds', '1–2 minutes', 'Longer than 2 minutes', 'Not sure yet'];
+const deadlines = ['As soon as possible', 'Within 2 weeks', 'Within 1 month', '1–3 months', 'Flexible'];
+const budgets = ['Under $500', '$500 – $1,500', '$1,500 – $3,000', '$3,000 – $6,000', '$6,000+', 'Not sure yet'];
+const configured = !site.web3formsKey.startsWith('YOUR_');
+---
+
+<form action="https://api.web3forms.com/submit" method="POST" class="grid gap-6" data-contact-form data-configured={String(configured)}>
+  <input type="hidden" name="access_key" value={site.web3formsKey} />
+  <input type="hidden" name="subject" value="New project inquiry — Walaa 3D website" />
+  <input type="hidden" name="from_name" value="Walaa 3D website" />
+  <input type="hidden" name="redirect" value={thankYou} />
+  <input type="checkbox" name="botcheck" class="hidden" style="display:none" tabindex="-1" autocomplete="off" />
+
+  <div class="grid gap-6 sm:grid-cols-2">
+    <div>
+      <label for="cf-name" class="field-label">Name <span class="text-gold-deep">*</span></label>
+      <input id="cf-name" name="name" type="text" required autocomplete="name" class="field" />
+    </div>
+    <div>
+      <label for="cf-company" class="field-label">Company</label>
+      <input id="cf-company" name="company" type="text" autocomplete="organization" class="field" />
+    </div>
+    <div>
+      <label for="cf-email" class="field-label">Email <span class="text-gold-deep">*</span></label>
+      <input id="cf-email" name="email" type="email" required autocomplete="email" class="field" />
+    </div>
+    <div>
+      <label for="cf-product" class="field-label">Product <span class="text-gold-deep">*</span></label>
+      <input id="cf-product" name="product" type="text" required placeholder="e.g. smart home device, robot, medical device" class="field" />
+    </div>
+  </div>
+
+  <fieldset>
+    <legend class="field-label">What do you need?</legend>
+    <div class="mt-1 flex flex-wrap gap-2">
+      {needs.map((n) => (
+        <label class="cursor-pointer">
+          <input type="checkbox" name="needs[]" value={n} class="peer sr-only" />
+          <span class="inline-block rounded-full border border-line bg-surface px-4 py-2 text-sm transition-colors peer-checked:border-gold peer-checked:bg-gold peer-focus-visible:outline-2 peer-focus-visible:outline-gold-deep hover:border-ink/30">{n}</span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div class="grid gap-6 sm:grid-cols-3">
+    <div>
+      <label for="cf-length" class="field-label">Approx. video length</label>
+      <select id="cf-length" name="video_length" class="field">
+        <option value="">Select…</option>
+        {lengths.map((o) => <option>{o}</option>)}
+      </select>
+    </div>
+    <div>
+      <label for="cf-deadline" class="field-label">Deadline</label>
+      <select id="cf-deadline" name="deadline" class="field">
+        <option value="">Select…</option>
+        {deadlines.map((o) => <option>{o}</option>)}
+      </select>
+    </div>
+    <div>
+      <label for="cf-budget" class="field-label">Budget range</label>
+      <select id="cf-budget" name="budget" class="field">
+        <option value="">Select…</option>
+        {budgets.map((o) => <option>{o}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <label for="cf-link" class="field-label">Upload / reference link</label>
+    <input id="cf-link" name="reference_link" type="url" inputmode="url" placeholder="Google Drive, Dropbox, WeTransfer or reference video link" class="field" />
+    <p class="mt-1.5 text-xs text-ink-faint">Share CAD files, photos or references via a link.</p>
+  </div>
+
+  <div>
+    <label for="cf-message" class="field-label">Tell me about your project</label>
+    <textarea id="cf-message" name="message" rows="5" class="field resize-y" placeholder="Goals, audience, where the video will be used…"></textarea>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-4">
+    <button type="submit" class="btn btn-gold disabled:opacity-60">
+      <span data-label>Send Project Inquiry</span> <Icon name="arrow" class="arrow size-4" />
+    </button>
+    <p class="text-sm text-ink-soft" role="status" aria-live="polite" data-status></p>
+  </div>
+</form>
+
+<script>
+  import { site } from '@/config/site';
+
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const status = form?.querySelector<HTMLElement>('[data-status]');
+  const label = form?.querySelector<HTMLElement>('[data-label]');
+  const button = form?.querySelector<HTMLButtonElement>('button[type=submit]');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!status || !label || !button) return;
+
+    if (form.dataset.configured !== 'true') {
+      status.textContent = `The form isn't connected yet — please email ${site.contact.email}.`;
+      return;
+    }
+
+    const data = new FormData(form);
+    // Web3Forms expects a flat field; join multi-select checkboxes.
+    const needs = data.getAll('needs[]').join(', ');
+    data.delete('needs[]');
+    data.set('needs', needs || '—');
+    data.delete('redirect');
+
+    button.disabled = true;
+    label.textContent = 'Sending…';
+    try {
+      const res = await fetch(form.action, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message);
+      window.location.href = '/thank-you/';
+    } catch {
+      status.textContent = `Something went wrong. Please try again or email ${site.contact.email}.`;
+      button.disabled = false;
+      label.textContent = 'Send Project Inquiry';
+    }
+  });
+</script>

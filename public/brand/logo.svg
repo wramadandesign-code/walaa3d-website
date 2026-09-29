@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 56" fill="none" role="img" aria-label="Walaa 3D — Product Animation">
+  <g transform="translate(2 4)">
+    <path d="M24 3 42 13.5 24 24 6 13.5Z" fill="#DCC28A"/>
+    <path d="M24 3 42 13.5v21L24 45 6 34.5v-21Z" stroke="#151515" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M6 13.5 15 39.75 24 24l9 15.75 9-26.25" stroke="#151515" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+  <text x="60" y="30" font-family="Jost, 'Futura', 'Century Gothic', sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#151515">WALAA<tspan fill="#8C6D33" dx="6">3D</tspan></text>
+  <text x="61" y="46" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-size="9.5" font-weight="500" letter-spacing="3.2" fill="#55554F">PRODUCT ANIMATION</text>
+</svg>

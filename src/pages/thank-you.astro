@@ -1,0 +1,18 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+---
+
+<BaseLayout title="Thank you" description="Your project inquiry has been sent." noindex>
+  <section class="container-x grid min-h-[80vh] place-items-center pb-20 pt-36 text-center">
+    <div class="max-w-xl">
+      <span class="mx-auto grid size-16 place-items-center rounded-full bg-gold"><Icon name="check" class="size-7" /></span>
+      <h1 class="mt-8 font-display text-5xl font-medium sm:text-6xl">Thank you!</h1>
+      <p class="prose-body mt-5">Your project inquiry has been received. You'll get a reply within 1–2 business days.</p>
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a href="/work/" class="btn btn-gold">Explore Projects <Icon name="arrow" class="arrow size-4" /></a>
+        <a href="/" class="btn btn-ghost">Back to home</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

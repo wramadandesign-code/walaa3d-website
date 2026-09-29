@@ -1,0 +1,54 @@
+---
+/**
+ * Muted, looping, lazy video with poster. Plays only while visible (see scripts/site.ts).
+ * Files expected: /media/video/<name>-loop.{webm,mp4} and /media/posters/<name>.webp
+ * With `full`, plays the complete /media/video/<name>.mp4 with controls and sound available.
+ */
+interface Props {
+  name: string;
+  label: string;
+  class?: string;
+  eager?: boolean;
+  full?: boolean;
+  width?: number;
+  height?: number;
+}
+const { name, label, class: cls = '', eager = false, full = false, width, height } = Astro.props;
+const poster = `/media/posters/${name}.webp`;
+---
+
+{full ? (
+  <video
+    class:list={['block h-full w-full bg-night object-contain', cls]}
+    poster={poster}
+    controls
+    muted
+    autoplay
+    loop
+    playsinline
+    preload="metadata"
+    width={width}
+    height={height}
+    aria-label={label}
+  >
+    <source src={`/media/video/${name}.mp4`} type="video/mp4" />
+  </video>
+) : (
+  <video
+    class:list={['block h-full w-full bg-night object-cover', cls]}
+    poster={poster}
+    muted
+    loop
+    playsinline
+    autoplay={eager}
+    preload={eager ? 'auto' : 'none'}
+    data-autoplay
+    width={width}
+    height={height}
+    aria-label={label}
+    disablepictureinpicture
+  >
+    <source src={`/media/video/${name}-loop.webm`} type="video/webm" />
+    <source src={`/media/video/${name}-loop.mp4`} type="video/mp4" />
+  </video>
+)}

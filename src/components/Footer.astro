@@ -1,0 +1,55 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { site, whatsappUrl } from '@/config/site';
+import { services } from '@/data/services';
+import { projects } from '@/data/projects';
+
+const socials = Object.entries(site.social).filter(([, url]) => url);
+const wa = whatsappUrl();
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-line bg-mist/60">
+  <div class="container-x grid gap-12 py-16 md:grid-cols-12 md:py-20">
+    <div class="md:col-span-4">
+      <a href="/" aria-label="Walaa 3D Animation — home"><Logo /></a>
+      <p class="mt-6 max-w-sm text-sm leading-relaxed text-ink-soft">
+        Cinematic 3D product animation and product visualization for brands, startups and manufacturers — by {site.person}.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-2">
+        <a href={`mailto:${site.contact.email}`} class="btn btn-ghost !px-4 !py-2.5"><Icon name="mail" class="size-4" /> {site.contact.email}</a>
+        {wa && <a href={wa} target="_blank" rel="noopener" class="btn btn-ghost !px-4 !py-2.5"><Icon name="whatsapp" class="size-4" /> WhatsApp</a>}
+      </div>
+    </div>
+
+    <nav aria-label="Services" class="md:col-span-3 md:col-start-6">
+      <h2 class="eyebrow">Services</h2>
+      <ul class="mt-5 space-y-3 text-sm">
+        {services.map((s) => <li><a href={`/services/${s.slug}/`} class="link-underline">{s.title}</a></li>)}
+      </ul>
+    </nav>
+
+    <nav aria-label="Selected work" class="md:col-span-2">
+      <h2 class="eyebrow">Work</h2>
+      <ul class="mt-5 space-y-3 text-sm">
+        {projects.slice(0, 5).map((p) => <li><a href={`/work/${p.slug}/`} class="link-underline">{p.title}</a></li>)}
+      </ul>
+    </nav>
+
+    <nav aria-label="Studio" class="md:col-span-2">
+      <h2 class="eyebrow">Studio</h2>
+      <ul class="mt-5 space-y-3 text-sm">
+        <li><a href="/about/" class="link-underline">About</a></li>
+        <li><a href="/#process" class="link-underline">Process</a></li>
+        <li><a href="/contact/" class="link-underline">Start a Project</a></li>
+        {socials.map(([name, url]) => <li><a href={url} target="_blank" rel="noopener me" class="link-underline capitalize">{name}</a></li>)}
+      </ul>
+    </nav>
+  </div>
+
+  <div class="container-x flex flex-col gap-3 border-t border-line py-6 text-xs text-ink-faint sm:flex-row sm:items-center sm:justify-between">
+    <p>© {year} {site.person} · {site.brand}. All rights reserved.</p>
+    <p>{site.contact.location}</p>
+  </div>
+</footer>

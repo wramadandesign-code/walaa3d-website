@@ -1,0 +1,56 @@
+---
+import { originOf } from '@/config/urls';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { projects } from '@/data/projects';
+
+// Layout order: portrait cards fill single columns, landscape cards span two.
+const order = ['01', '02', '03', '05', '04', '06'].map((n) => projects.find((p) => p.number === n)!);
+
+const origin = originOf(Astro.site!);
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: '3D Product Animation Portfolio',
+    url: `${origin}/work/`,
+    hasPart: projects.map((p) => ({ '@type': 'CreativeWork', name: p.title, url: `${origin}/work/${p.slug}/` })),
+  },
+];
+---
+
+<BaseLayout
+  title="3D Product Animation Portfolio"
+  description="3D product animation portfolio: product commercials, exploded views and mechanism animations for robotics, electronics, medical devices and appliances."
+  breadcrumbs={[{ name: 'Work', href: '/work/' }]}
+  schema={schema}
+>
+  <section class="container-x pb-10 pt-36 sm:pt-44">
+    <SectionHeader as="h1" eyebrow="Work" title="3D product animation portfolio" intro="A selection of product commercials, reveals, exploded views and mechanism animations for robotics, consumer electronics, medical devices and home appliances." />
+  </section>
+
+  <section class="container-x" aria-label="Projects">
+    <div class="grid gap-x-8 gap-y-16 sm:grid-flow-row-dense sm:grid-cols-2 lg:grid-cols-3">
+      {order.map((p) => {
+        const idx = p.media.length > 1 ? 1 : 0;
+        const wide = p.media[idx].aspect !== 'portrait';
+        return (
+          <ProjectCard project={p} mediaIndex={idx} headingLevel="h2" class={wide ? 'sm:col-span-2' : ''} frameClass={wide ? 'aspect-[4/5] sm:aspect-[16/10]' : 'aspect-[4/5]'} />
+        );
+      })}
+      <a href="/contact/" class="group flex aspect-[4/5] flex-col justify-between rounded-2xl bg-gold-pale p-8 ring-1 ring-gold-light transition-colors duration-500 hover:bg-gold-light" data-reveal>
+        <span class="eyebrow">Your product</span>
+        <span>
+          <span class="block font-display text-4xl font-medium leading-tight">Could be next.</span>
+          <span class="mt-4 block text-ink-soft">Send a CAD file, photos or sketches and get a clear quote.</span>
+          <span class="btn btn-gold mt-8">Start a Project <Icon name="arrow" class="arrow size-4" /></span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>

@@ -1,0 +1,28 @@
+---
+import VideoLoop from './VideoLoop.astro';
+import Icon from './Icon.astro';
+import type { Project } from '@/data/projects';
+
+interface Props { project: Project; mediaIndex?: number; class?: string; frameClass?: string; headingLevel?: 'h2' | 'h3' }
+const { project, mediaIndex = 0, class: cls = '', frameClass = 'aspect-[4/5]', headingLevel: H = 'h3' } = Astro.props;
+const m = project.media[mediaIndex] ?? project.media[0];
+---
+
+<article class:list={['group', cls]} data-reveal>
+  <a href={`/work/${project.slug}/`} class="block" aria-label={`${project.title} — ${project.type}`}>
+    <div class:list={['relative overflow-hidden rounded-2xl bg-night', frameClass]}>
+      <VideoLoop name={m.name} label={`${project.title} — ${project.type} preview`} width={m.width} height={m.height} class="transition-transform duration-[1.2s] ease-out-expo group-hover:scale-[1.04]" />
+      <span class="absolute left-4 top-4 rounded-full bg-canvas/85 px-3 py-1 text-[0.7rem] font-medium uppercase tracking-[0.14em] text-ink backdrop-blur">{project.type}</span>
+      <span class="absolute bottom-4 right-4 grid size-11 translate-y-2 place-items-center rounded-full bg-gold text-ink opacity-0 transition-all duration-500 ease-out-expo group-hover:translate-y-0 group-hover:opacity-100">
+        <Icon name="arrow-up-right" class="size-5" />
+      </span>
+    </div>
+    <div class="mt-4 flex items-baseline justify-between gap-4 border-b border-line pb-4">
+      <div class="flex items-baseline gap-4">
+        <span class="font-display text-sm text-ink-faint">{project.number}</span>
+        <H class="font-display text-xl font-medium sm:text-2xl">{project.title}</H>
+      </div>
+      <span class="hidden shrink-0 text-xs text-ink-soft sm:inline">{project.industry}</span>
+    </div>
+  </a>
+</article>

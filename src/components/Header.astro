@@ -1,0 +1,46 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { nav } from '@/config/site';
+// pathname without the deploy base (e.g. "/walaa") so it compares with nav hrefs
+const path = Astro.url.pathname.slice(import.meta.env.BASE_URL.replace(/\/$/, '').length) || '/';
+const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
+---
+
+<header class="site-header fixed inset-x-0 top-0 z-50 border-b border-transparent transition-[background-color,border-color] duration-500" data-scrolled="false">
+  <div class="container-x flex h-18 items-center justify-between gap-6 sm:h-20">
+    <a href="/" aria-label="Walaa 3D Animation — home" class="relative z-10 text-ink">
+      <Logo />
+    </a>
+
+    <nav aria-label="Main" class="hidden items-center gap-9 md:flex">
+      {nav.map((item) => (
+        <a href={item.href} class:list={['link-underline text-sm font-medium transition-colors hover:text-ink', isActive(item.href) ? 'text-ink' : 'text-ink-soft']} aria-current={isActive(item.href) ? 'page' : undefined}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a href="/contact/" class="btn btn-gold hidden !py-2.5 sm:inline-flex">
+        Start a Project <Icon name="arrow" class="arrow size-4" />
+      </a>
+      <button type="button" class="group relative z-10 grid size-11 place-items-center rounded-full border border-ink/15 md:hidden" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <Icon name="menu" class="size-5 group-aria-expanded:hidden" /><Icon name="close" class="hidden size-5 group-aria-expanded:block" />
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" data-menu class="pointer-events-none fixed inset-0 bg-canvas opacity-0 transition-opacity duration-300 data-[open]:pointer-events-auto data-[open]:opacity-100 md:hidden">
+    <div class="container-x flex h-full flex-col justify-between pb-10 pt-28">
+      <nav aria-label="Mobile" class="flex flex-col">
+        {[{ label: 'Home', href: '/' }, ...nav, { label: 'Contact', href: '/contact/' }].map((item, i) => (
+          <a href={item.href} class="flex items-baseline gap-4 border-b border-line py-4 font-display text-4xl font-medium">
+            <span class="text-xs text-ink-faint">0{i + 1}</span>{item.label}
+          </a>
+        ))}
+      </nav>
+      <a href="/contact/" class="btn btn-gold w-full">Start a Project <Icon name="arrow" class="arrow size-4" /></a>
+    </div>
+  </div>
+</header>

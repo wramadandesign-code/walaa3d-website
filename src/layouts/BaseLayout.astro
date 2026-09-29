@@ -1,0 +1,118 @@
+---
+import { originOf, abs } from '@/config/urls';
+import '@/styles/global.css';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import { site } from '@/config/site';
+
+interface Props {
+  /** Page title without brand suffix. Omit on the homepage to use the full SEO title. */
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article' | 'video.other';
+  noindex?: boolean;
+  /** Extra JSON-LD objects for this page */
+  schema?: Record<string, unknown>[];
+  breadcrumbs?: { name: string; href: string }[];
+}
+
+const { title, description = site.description, image = site.ogImage, type = 'website', noindex = false, schema = [], breadcrumbs } = Astro.props;
+
+const fullTitle = title ? site.titleTemplate.replace('%s', title) : site.title;
+const canonical = new URL(Astro.url.pathname, Astro.site).href; // pathname already includes the base
+const ogImage = abs(Astro.site!, image);
+const origin = originOf(Astro.site!);
+
+const sameAs = Object.values(site.social).filter(Boolean);
+
+const baseSchema: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ProfessionalService',
+    '@id': `${origin}/#business`,
+    name: site.brand,
+    description: site.description,
+    url: `${origin}/`,
+    logo: `${origin}/brand/mark-512.png`,
+    image: `${origin}${site.ogImage}`,
+    email: site.contact.email,
+    areaServed: 'Worldwide',
+    founder: { '@id': `${origin}/#person` },
+    knowsAbout: ['3D product animation', 'Product visualization', '3D rendering', 'Exploded view animation', 'Industrial design'],
+    ...(sameAs.length ? { sameAs } : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': `${origin}/#person`,
+    name: site.person,
+    jobTitle: site.jobTitle,
+    url: `${origin}/about/`,
+    worksFor: { '@id': `${origin}/#business` },
+    ...(sameAs.length ? { sameAs } : {}),
+  },
+];
+
+if (breadcrumbs?.length) {
+  baseSchema.push({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [{ name: 'Home', href: '/' }, ...breadcrumbs].map((b, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: b.name,
+      item: abs(Astro.site!, b.href),
+    })),
+  });
+}
+---
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>document.documentElement.classList.replace('no-js', 'js');</script>
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="author" content={site.person} />
+    <meta name="theme-color" content={site.themeColor} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.brand} />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <slot name="head" />
+
+    {[...baseSchema, ...schema].map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+  </head>
+  <body class="min-h-dvh overflow-x-clip">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-canvas">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      import '@/scripts/site';
+    </script>
+  </body>
+</html>

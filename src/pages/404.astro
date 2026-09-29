@@ -1,0 +1,18 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+---
+
+<BaseLayout title="Page not found" description="The page you are looking for does not exist." noindex>
+  <section class="container-x grid min-h-[80vh] place-items-center pb-20 pt-36 text-center">
+    <div class="max-w-xl">
+      <p class="font-display text-[8rem] font-light leading-none text-gold-deep">404</p>
+      <h1 class="mt-4 font-display text-4xl font-medium">This page left the render queue.</h1>
+      <p class="prose-body mt-4">The page you're looking for doesn't exist or has moved.</p>
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a href="/" class="btn btn-gold">Back to home <Icon name="arrow" class="arrow size-4" /></a>
+        <a href="/work/" class="btn btn-ghost">View work</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
