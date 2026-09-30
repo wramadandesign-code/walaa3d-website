@@ -26,8 +26,8 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          # Change this when a custom domain is connected (e.g. https://walaa3d.com)
-          PUBLIC_SITE_URL: https://mo3110.github.io/walaa
+          # Public URL of the site (custom domain, DNS on Cloudflare)
+          PUBLIC_SITE_URL: https://walaa3d.studio
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

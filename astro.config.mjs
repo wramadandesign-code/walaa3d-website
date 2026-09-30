@@ -5,9 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 import basePathLinks from './scripts/base-path-links.mjs';
 
 // PUBLIC_SITE_URL = full public URL of the site, including any sub-path.
-//   GitHub Pages:  https://mo3110.github.io/walaa   (set in .github/workflows/deploy.yml)
-//   Custom domain: https://example.com
-const siteUrl = new URL(process.env.PUBLIC_SITE_URL || 'https://mo3110.github.io/walaa');
+//   Production:    https://walaa3d.studio          (set in .github/workflows/deploy.yml)
+//   Sub-path host: https://user.github.io/repo     (base-path-links.mjs handles the prefix)
+const siteUrl = new URL(process.env.PUBLIC_SITE_URL || 'https://walaa3d.studio');
 const base = siteUrl.pathname.replace(/\/$/, '') || '/';
 
 export default defineConfig({

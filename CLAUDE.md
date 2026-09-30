@@ -40,11 +40,13 @@ node scripts/make-icons.mjs   # re-rasterize PNG icons from public/brand/mark.sv
 npm run offline               # build + share/offline/ copy that opens from disk (for sending as a zip)
 ```
 
-## Hosting & base path
+## Hosting & domain
 
-- Repo: https://github.com/Mo3110/walaa — pushes to `main` deploy via GitHub Actions (`.github/workflows/deploy.yml`) to https://mo3110.github.io/walaa/.
-- The site is served under `/walaa`. Keep writing root-relative links in source (`/work/`, `/media/…`): `scripts/base-path-links.mjs` prefixes them at build time. For absolute URLs (canonical, OG, JSON-LD) use `abs()` / `originOf()` from `src/config/urls.ts` — never `Astro.site` directly. In client JS, don't hard-code paths except via strings the integration rewrites (`"/thank-you/"`).
-- Dev server URL is http://localhost:4321/walaa/.
+- **Live:** https://walaa3d.studio — domain registered at Namecheap, nameservers + DNS on Cloudflare (Walaa's account), site on GitHub Pages.
+- **Repo:** https://github.com/wramadandesign-code/walaa3d-website — every push to `main` builds and deploys via `.github/workflows/deploy.yml` (Pages source = GitHub Actions, custom domain walaa3d.studio, `public/CNAME`).
+- DNS (Cloudflare): apex A → 185.199.108–111.153, `www` CNAME → wramadandesign-code.github.io. Keep records **DNS only** (grey cloud) so GitHub can issue/renew the HTTPS certificate.
+- *.netlify.app is blocked on Walaa's ISP — don't use Netlify.
+- Base-path support is kept for sub-path hosts: keep writing root-relative links in source (`/work/`, `/media/…`) — `scripts/base-path-links.mjs` prefixes them only when `base` ≠ `/`. For absolute URLs (canonical, OG, JSON-LD) use `abs()` / `originOf()` from `src/config/urls.ts`, never `Astro.site` directly.
 
 ## Structure
 
@@ -90,7 +92,7 @@ For every video `name` the site expects:
 - One `<h1>` per page; titles ≤ 60 chars via `title` prop (template adds "| Walaa 3D Animation"), descriptions 140–160 chars.
 - Keyword-rich slugs (`/work/…-animation/`, `/services/3d-product-animation/`). Target terms: 3D product animation, product visualization, product commercial, exploded view animation, mechanism animation, product launch video, 3D rendering.
 - Every video has a poster, `aria-label`, and VideoObject JSON-LD on its project page. Keep `uploadDate` accurate.
-- `PUBLIC_SITE_URL` sets the public URL **including any sub-path**; it drives `site` + `base` in astro.config.mjs, canonical/OG/JSON-LD and the sitemap. Default: https://mo3110.github.io/walaa (GitHub Pages). *.netlify.app is blocked on Walaa's ISP, so Netlify is not used. For a custom domain, change it in .github/workflows/deploy.yml.
+- `PUBLIC_SITE_URL` (default https://walaa3d.studio, also set in the deploy workflow) drives `site` + `base`, canonical/OG/JSON-LD and the sitemap.
 
 ## Open TODOs (need input from Walaa)
 
@@ -99,4 +101,4 @@ For every video `name` the site expects:
 - Logo files and portrait photo → portrait replaces the video block in `src/pages/about.astro` (marked TODO).
 - HQ renders to replace WhatsApp-compressed videos.
 - Verify project descriptions, timelines ("1–3 weeks", "24–48 h quote") and budget ranges (USD) in the form.
-- Real domain → set `PUBLIC_SITE_URL`, add to Google Search Console, submit `sitemap-index.xml`.
+- Add https://walaa3d.studio to Google Search Console (DNS TXT verification via Cloudflare) and submit `sitemap-index.xml`.
