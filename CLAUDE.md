@@ -106,7 +106,7 @@ For every video `name` the site expects:
 
 ## Open TODOs (need input from Walaa)
 
-- LinkedIn link (Instagram, TikTok, YouTube, Behance are set in `site.social`; icons via `SocialLinks.astro` in header, mobile menu and footer).
+- Social profiles (Instagram, TikTok, YouTube, LinkedIn, Behance, Pinterest) are set in `site.social`; icons via `SocialLinks.astro` (header shows them from xl ≥1280px; mobile menu + footer always).
 - Web3Forms access key → `site.web3formsKey` (until then the form shows a "not connected" message).
 - Logo files (portrait is in `public/media/about/walaa-ramadan.*`, original in `source-media/founder.jpeg`).
 - HQ renders are in `source-media/HQ/` (AI-upscaled). Full videos are capped at 1920px long side, loops at 1600px.

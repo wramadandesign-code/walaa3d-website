@@ -29,8 +29,9 @@ export const site = {
     instagram: 'https://www.instagram.com/walaadesign31/',
     tiktok: 'https://www.tiktok.com/@walaa3danimation',
     youtube: 'https://www.youtube.com/@walaa3danimation',
-    linkedin: '',
+    linkedin: 'https://www.linkedin.com/company/walaa-3d-product-animation/',
     behance: 'https://www.behance.net/walaaramadan',
+    pinterest: 'https://www.pinterest.com/wramadandesign/',
   },
 
   /**
