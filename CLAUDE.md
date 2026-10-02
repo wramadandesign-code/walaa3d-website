@@ -25,7 +25,7 @@ The visual reference is danthree.studio (premium, editorial, video-led), recolou
 - **Astro 7** (static output) + **Tailwind CSS v4** via `@tailwindcss/vite` (no tailwind.config — tokens live in `src/styles/global.css` `@theme`).
 - Fonts self-hosted via Fontsource: **Jost Variable** (display), **Inter Variable** (body).
 - `@astrojs/sitemap` for `sitemap-index.xml`; `src/pages/robots.txt.ts` generates robots.txt.
-- Contact form posts to **Web3Forms** (`site.web3formsKey` in `src/config/site.ts`), progressively enhanced with fetch; redirects to `/thank-you/`.
+- Contact form posts to **FormSubmit.co** (free, no account) → emails `site.formTarget` (contact@walaa3d.studio, or the private alias FormSubmit sends after activation). JS path uses the `/ajax/` JSON endpoint, then redirects to `/thank-you/`; no-JS fallback posts the form with `_next`. Auto-reply to the client is set via `_autoresponse`.
 - Node ≥ 22.12. Path alias `@/*` → `src/*`.
 
 ## Commands
@@ -107,7 +107,6 @@ For every video `name` the site expects:
 ## Open TODOs (need input from Walaa)
 
 - Social profiles (Instagram, TikTok, YouTube, LinkedIn, Behance, Pinterest) are set in `site.social`; icons via `SocialLinks.astro` (header shows them from xl ≥1280px; mobile menu + footer always).
-- Web3Forms access key → `site.web3formsKey` (until then the form shows a "not connected" message).
 - Logo files (portrait is in `public/media/about/walaa-ramadan.*`, original in `source-media/founder.jpeg`).
 - HQ renders are in `source-media/HQ/` (AI-upscaled). Full videos are capped at 1920px long side, loops at 1600px.
 - Verify project descriptions, timelines ("1–3 weeks", "24–48 h quote") and budget ranges (USD) in the form.

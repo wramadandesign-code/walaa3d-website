@@ -35,14 +35,14 @@ export const site = {
   },
 
   /**
-   * Contact form backend (Web3Forms — free, emails every submission to you).
-   * Get a key at https://web3forms.com (enter your email, the key arrives by email),
-   * then paste it here. It is safe to expose publicly.
+   * Contact form backend: FormSubmit.co (free, no account). Submissions are emailed to the target.
+   * `formTarget` can be the plain address or — after activation — the private alias FormSubmit
+   * emails you (a random string), which hides the address from spam bots.
    */
+  formTarget: 'contact@walaa3d.studio',
+
   /** Google Analytics 4 Measurement ID (property "walaa3d.studio"). Loaded on production builds only. */
   gaId: 'G-ZDJVYQ1BJS',
-
-  web3formsKey:'YOUR_WEB3FORMS_ACCESS_KEY', // TODO
 } as const;
 
 export const nav = [
