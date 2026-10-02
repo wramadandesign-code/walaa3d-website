@@ -1,6 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
+import SocialLinks from './SocialLinks.astro';
 import { nav } from '@/config/site';
 // pathname without the deploy base (e.g. "/walaa") so it compares with nav hrefs
 const path = Astro.url.pathname.slice(import.meta.env.BASE_URL.replace(/\/$/, '').length) || '/';
@@ -22,6 +23,7 @@ const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
     </nav>
 
     <div class="flex items-center gap-3">
+      <SocialLinks class="hidden border-r border-line pr-3 lg:flex" />
       <a href="/contact/" class="btn btn-gold hidden !py-2.5 sm:inline-flex">
         Start a Project <Icon name="arrow" class="arrow size-4" />
       </a>
@@ -40,7 +42,10 @@ const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
           </a>
         ))}
       </nav>
-      <a href="/contact/" class="btn btn-gold w-full">Start a Project <Icon name="arrow" class="arrow size-4" /></a>
+      <div class="space-y-6">
+        <SocialLinks variant="pill" />
+        <a href="/contact/" class="btn btn-gold w-full">Start a Project <Icon name="arrow" class="arrow size-4" /></a>
+      </div>
     </div>
   </div>
 </header>

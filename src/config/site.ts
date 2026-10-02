@@ -23,13 +23,14 @@ export const site = {
     location: 'Cairo, Egypt · Working worldwide',
   },
 
+  // Shown as icons in the header + footer (SocialLinks.astro) and used as JSON-LD sameAs.
+  // Order here = display order. Leave a value empty to hide it.
   social: {
-    // TODO: fill in; empty entries are hidden automatically
-    behance: '',
-    instagram: '',
+    instagram: 'https://www.instagram.com/walaadesign31/',
+    tiktok: 'https://www.tiktok.com/@walaa3danimation',
+    youtube: 'https://www.youtube.com/@walaa3danimation',
     linkedin: '',
-    youtube: '',
-    vimeo: '',
+    behance: '',
   },
 
   /**

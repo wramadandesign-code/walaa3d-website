@@ -1,0 +1,52 @@
+---
+import { site } from '@/config/site';
+
+interface Props {
+  class?: string;
+  /** "plain" = bare icons (header), "pill" = round outlined buttons (footer, mobile menu) */
+  variant?: 'plain' | 'pill';
+}
+const { class: cls = '', variant = 'plain' } = Astro.props;
+
+const labels: Record<string, string> = { instagram: 'Instagram', tiktok: 'TikTok', youtube: 'YouTube', linkedin: 'LinkedIn', behance: 'Behance' };
+
+// Brand marks (24×24). Instagram is drawn as an outline; the others are solid glyphs.
+const icons: Record<string, string> = {
+  instagram:
+    '<rect x="2.75" y="2.75" width="18.5" height="18.5" rx="5.25" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.25" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.15" fill="currentColor"/>',
+  tiktok:
+    '<path fill="currentColor" d="M16.6 2h-3.2v13.1a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V9a6.1 6.1 0 1 0 5.2 6.1V8.5a7.7 7.7 0 0 0 4.4 1.4V6.7a4.5 4.5 0 0 1-4.4-4.7Z"/>',
+  youtube:
+    '<path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.2 3.6-6.2 3.6Z"/>',
+  linkedin:
+    '<path fill="currentColor" d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6h.1a3.8 3.8 0 0 1 3.4-1.9c3.6 0 4.3 2.4 4.3 5.5v6.3ZM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2ZM7.1 20.5H3.5V9h3.6v11.5Z"/>',
+  behance:
+    '<path fill="currentColor" d="M8.2 11.4c.8-.4 1.3-1.1 1.3-2.1C9.5 7.2 8 6.6 6.2 6.6H1v10.8h5.4c2 0 3.9-1 3.9-3.2 0-1.4-.7-2.4-2.1-2.8ZM3.4 8.5h2.3c.9 0 1.6.2 1.6 1.2 0 .9-.6 1.2-1.4 1.2H3.4V8.5Zm2.5 7H3.4v-2.9h2.6c1 0 1.7.4 1.7 1.5s-.8 1.4-1.8 1.4ZM17.2 9c-2.4 0-4 1.8-4 4.2 0 2.5 1.5 4.2 4 4.2 1.9 0 3.1-.8 3.7-2.7h-1.9c-.2.7-1.1 1-1.7 1-1.2 0-1.9-.7-1.9-1.9h5.6c.1-2.5-1.2-4.8-3.8-4.8Zm-1.8 3.4c.1-1 .7-1.6 1.7-1.6s1.5.6 1.6 1.6h-3.3ZM15 6.9h4.4v1.1H15V6.9Z"/>',
+};
+
+const links = Object.entries(site.social).filter(([key, url]) => url && icons[key]);
+---
+
+{links.length > 0 && (
+  <ul class:list={['flex items-center', variant === 'pill' ? 'gap-2' : 'gap-1', cls]}>
+    {links.map(([key, url]) => (
+      <li>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener me"
+          aria-label={`${site.person} on ${labels[key]}`}
+          title={labels[key]}
+          class:list={[
+            'grid place-items-center transition-colors duration-300',
+            variant === 'pill'
+              ? 'size-11 rounded-full border border-ink/15 text-ink hover:border-gold hover:bg-gold'
+              : 'size-9 rounded-full text-ink-soft hover:bg-gold-pale hover:text-ink',
+          ]}
+        >
+          <svg viewBox="0 0 24 24" class={variant === 'pill' ? 'size-[18px]' : 'size-[17px]'} aria-hidden="true" set:html={icons[key]} />
+        </a>
+      </li>
+    ))}
+  </ul>
+)}

@@ -1,11 +1,11 @@
 ---
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
+import SocialLinks from './SocialLinks.astro';
 import { site, whatsappUrl, telUrl } from '@/config/site';
 import { services } from '@/data/services';
 import { projects } from '@/data/projects';
 
-const socials = Object.entries(site.social).filter(([, url]) => url);
 const wa = whatsappUrl();
 const year = new Date().getFullYear();
 ---
@@ -21,6 +21,10 @@ const year = new Date().getFullYear();
         <a href={`mailto:${site.contact.email}`} class="btn btn-ghost !px-4 !py-2.5"><Icon name="mail" class="size-4" /> {site.contact.email}</a>
         {wa && <a href={wa} target="_blank" rel="noopener" class="btn btn-ghost !px-4 !py-2.5"><Icon name="whatsapp" class="size-4" /> WhatsApp</a>}
         <a href={telUrl} class="btn btn-ghost !px-4 !py-2.5"><Icon name="phone" class="size-4" /> <span dir="ltr">{site.contact.phoneDisplay}</span></a>
+      </div>
+      <div class="mt-8">
+        <p class="eyebrow">Follow the work</p>
+        <SocialLinks variant="pill" class="mt-4" />
       </div>
     </div>
 
@@ -44,7 +48,6 @@ const year = new Date().getFullYear();
         <li><a href="/about/" class="link-underline">About</a></li>
         <li><a href="/#process" class="link-underline">Process</a></li>
         <li><a href="/contact/" class="link-underline">Start a Project</a></li>
-        {socials.map(([name, url]) => <li><a href={url} target="_blank" rel="noopener me" class="link-underline capitalize">{name}</a></li>)}
       </ul>
     </nav>
   </div>
