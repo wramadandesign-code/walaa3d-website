@@ -30,7 +30,7 @@ export const site = {
     tiktok: 'https://www.tiktok.com/@walaa3danimation',
     youtube: 'https://www.youtube.com/@walaa3danimation',
     linkedin: '',
-    behance: '',
+    behance: 'https://www.behance.net/walaaramadan',
   },
 
   /**
