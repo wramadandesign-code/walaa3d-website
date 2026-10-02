@@ -39,6 +39,16 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
   revealEls.forEach((el) => io.observe(el));
 }
 
+// Analytics: count WhatsApp / call / email clicks as leads (GA4 "generate_lead", by method).
+document.addEventListener('click', (e) => {
+  const a = (e.target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
+  const gtag = (window as any).gtag;
+  if (!a || !gtag) return;
+  const href = a.getAttribute('href') || '';
+  const method = href.startsWith('https://wa.me/') ? 'whatsapp' : href.startsWith('tel:') ? 'phone' : href.startsWith('mailto:') ? 'email' : '';
+  if (method) gtag('event', 'generate_lead', { method, link_location: a.closest('header, footer, main, [aria-label]')?.tagName.toLowerCase() });
+});
+
 // Autoplay muted loop videos only while on screen (saves bandwidth & battery).
 // Videos use preload="none" + poster, so nothing downloads until they are visible.
 const loops = document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]');

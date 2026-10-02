@@ -37,7 +37,10 @@ export const site = {
    * Get a key at https://web3forms.com (enter your email, the key arrives by email),
    * then paste it here. It is safe to expose publicly.
    */
-  web3formsKey: 'YOUR_WEB3FORMS_ACCESS_KEY', // TODO
+  /** Google Analytics 4 Measurement ID (property "walaa3d.studio"). Loaded on production builds only. */
+  gaId: 'G-ZDJVYQ1BJS',
+
+  web3formsKey:'YOUR_WEB3FORMS_ACCESS_KEY', // TODO
 } as const;
 
 export const nav = [

@@ -47,6 +47,8 @@ npm run offline               # build + share/offline/ copy that opens from disk
 - DNS (Cloudflare): apex A → 185.199.108–111.153, `www` CNAME → wramadandesign-code.github.io. Keep records **DNS only** (grey cloud) so GitHub can issue/renew the HTTPS certificate.
 - *.netlify.app is blocked on Walaa's ISP — don't use Netlify.
 - **Email:** contact@walaa3d.studio — *receiving* via Cloudflare Email Routing (rule → wramadan.design@gmail.com; MX route1-3.mx.cloudflare.net + DKIM `cf2024-1._domainkey`); *sending* via Gmail "Send mail as" through smtp.gmail.com:587 (app password). SPF: `v=spf1 include:_spf.mx.cloudflare.net include:_spf.google.com ~all`; DMARC `_dmarc` is `p=none` (keep it — Gmail-relayed mail isn't DKIM-aligned for walaa3d.studio, so a stricter policy would reject it).
+- **Google Search Console:** Domain property `walaa3d.studio` (wramadan.design@gmail.com), verified by the `google-site-verification=…` TXT record in Cloudflare — never delete it. Sitemap `https://walaa3d.studio/sitemap-index.xml` submitted.
+- **Google Analytics 4:** account "Walaa 3D Animation", property "walaa3d.studio" (Egypt time, USD), web stream "Walaa 3D website", Measurement ID `G-ZDJVYQ1BJS` (`site.gaId`). The tag loads only in production builds (BaseLayout). Leads are tracked as `generate_lead` with `method` = contact_form | whatsapp | phone | email (ContactForm.astro + scripts/site.ts) — `generate_lead` is marked as a key event in GA.
 - **Phone/WhatsApp:** +20 155 233 0060 (`site.contact.phone` / `whatsapp` in `src/config/site.ts`); floating WhatsApp button = `src/components/WhatsAppFab.astro`.
 - Base-path support is kept for sub-path hosts: keep writing root-relative links in source (`/work/`, `/media/…`) — `scripts/base-path-links.mjs` prefixes them only when `base` ≠ `/`. For absolute URLs (canonical, OG, JSON-LD) use `abs()` / `originOf()` from `src/config/urls.ts`, never `Astro.site` directly.
 
@@ -103,4 +105,4 @@ For every video `name` the site expects:
 - Logo files (portrait is in `public/media/about/walaa-ramadan.*`, original in `source-media/founder.jpeg`).
 - HQ renders are in `source-media/HQ/` (AI-upscaled). Full videos are capped at 1920px long side, loops at 1600px.
 - Verify project descriptions, timelines ("1–3 weeks", "24–48 h quote") and budget ranges (USD) in the form.
-- Add https://walaa3d.studio to Google Search Console (DNS TXT verification via Cloudflare) and submit `sitemap-index.xml`.
+- Google Business Profile (needs Walaa to verify in person) + Bing Webmaster Tools (can import from Search Console).
