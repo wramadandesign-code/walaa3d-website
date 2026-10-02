@@ -16,9 +16,11 @@ export const site = {
   themeColor: '#ECECEA',
 
   contact: {
-    email: 'hello@example.com', // TODO: real business email
-    whatsapp: '', // TODO: international format without "+" or spaces, e.g. 201001234567
-    location: 'Egypt · Working worldwide', // TODO: confirm
+    email: 'contact@walaa3d.studio', // Cloudflare Email Routing → forwards to Walaa's Gmail
+    phone: '+201552330060', // calls (E.164)
+    phoneDisplay: '+20 155 233 0060',
+    whatsapp: '201552330060', // wa.me format: international, no "+" or spaces
+    location: 'Cairo, Egypt · Working worldwide',
   },
 
   social: {
@@ -45,7 +47,9 @@ export const nav = [
   { label: 'About', href: '/about/' },
 ] as const;
 
-export const whatsappUrl = (text = 'Hi Walaa, I have a product I would like to animate.') =>
+export const telUrl = `tel:${site.contact.phone}`;
+
+export const whatsappUrl =(text = 'Hi Walaa, I have a product I would like to animate.') =>
   site.contact.whatsapp
     ? `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(text)}`
     : '';

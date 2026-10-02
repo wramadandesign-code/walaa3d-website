@@ -79,7 +79,7 @@ For every video `name` the site expects:
 - Generate all of them with `scripts/process-video.mjs`. ffmpeg is installed via winget (Gyan.FFmpeg); if not on PATH, set `FFMPEG` to `%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg_*\ffmpeg-*\bin\ffmpeg.exe`.
 - Loop videos use `preload="none"` + poster and only play while on screen — keep it that way for performance.
 - **To swap in HQ renders:** run the script with the same `name` to overwrite, then update `width/height/duration` in `projects.ts`. Pick a poster time without a dominant client logo.
-- Current media names → project: `cleaning-robot` (21:9) + `cleaning-robot-vertical` → Autonomous Cleaning Robot · `service-robot` → Hospitality Service Robot · `handheld-device` → Smart Pressure Sensor · `reception-robot` → Retail Assistant Robot · `operating-table` → Surgical Operating Table (source is only 598×360 — replace first) · `water-heater` → Electric Water Heater.
+- Current media names → project: `cleaning-robot` (21:9) + `cleaning-robot-vertical` → Autonomous Cleaning Robot · `service-robot` → Hospitality Service Robot · `handheld-device` → Smart Pressure Sensor · `reception-robot` → Retail Assistant Robot · `operating-table` → Surgical Operating Table · `water-heater` → Electric Water Heater.
 
 ## Adding a project
 
@@ -96,9 +96,9 @@ For every video `name` the site expects:
 
 ## Open TODOs (need input from Walaa)
 
-- Real email, WhatsApp number, social links, location → `src/config/site.ts`.
+- Social links → `src/config/site.ts` (email contact@walaa3d.studio, phone/WhatsApp +201552330060 are set).
 - Web3Forms access key → `site.web3formsKey` (until then the form shows a "not connected" message).
-- Logo files and portrait photo → portrait replaces the video block in `src/pages/about.astro` (marked TODO).
-- HQ renders to replace WhatsApp-compressed videos.
+- Logo files (portrait is in `public/media/about/walaa-ramadan.*`, original in `source-media/founder.jpeg`).
+- HQ renders are in `source-media/HQ/` (AI-upscaled). Full videos are capped at 1920px long side, loops at 1600px.
 - Verify project descriptions, timelines ("1–3 weeks", "24–48 h quote") and budget ranges (USD) in the form.
 - Add https://walaa3d.studio to Google Search Console (DNS TXT verification via Cloudflare) and submit `sitemap-index.xml`.

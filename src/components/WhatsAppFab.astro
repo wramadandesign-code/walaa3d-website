@@ -1,0 +1,18 @@
+---
+import Icon from './Icon.astro';
+import { whatsappUrl } from '@/config/site';
+const wa = whatsappUrl();
+---
+
+{wa && (
+  <a
+    href={wa}
+    target="_blank"
+    rel="noopener"
+    aria-label="Chat on WhatsApp"
+    class="group fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-gold p-3.5 text-ink shadow-[0_10px_30px_-10px_rgba(140,109,51,.7)] ring-1 ring-gold-deep/20 transition-all duration-500 ease-out-expo hover:-translate-y-1 hover:bg-gold-light sm:bottom-7 sm:right-7"
+  >
+    <Icon name="whatsapp" class="size-6" />
+    <span class="hidden max-w-0 overflow-hidden whitespace-nowrap text-sm font-medium transition-all duration-500 ease-out-expo group-hover:max-w-40 sm:inline">Chat on WhatsApp</span>
+  </a>
+)}

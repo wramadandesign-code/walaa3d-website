@@ -169,11 +169,18 @@ const schema = [
   <section class="container-x grid gap-14 py-24 sm:py-32 lg:grid-cols-12 lg:items-center" aria-labelledby="why-title">
     <div class="relative lg:col-span-5" data-reveal>
       <div class="aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-night">
-        <VideoLoop name={p3.media[0].name} label="Exploded view of a smart device — 3D product animation" width={720} height={1280} />
+        <VideoLoop name={p3.media[0].name} label="Exploded view of a smart device — 3D product animation" width={1080} height={1920} />
       </div>
-      <div class="absolute -bottom-6 -right-2 max-w-[15rem] rounded-2xl bg-surface p-5 shadow-xl ring-1 ring-line sm:-right-6">
-        <p class="font-display text-lg font-medium leading-snug">Product understanding + 3D visualization + AI-assisted animation</p>
-      </div>
+      <a href="/about/" class="group absolute -bottom-6 -right-2 flex max-w-[18rem] items-center gap-4 rounded-2xl bg-surface p-4 shadow-xl ring-1 ring-line transition-transform duration-500 ease-out-expo hover:-translate-y-1 sm:-right-6">
+        <picture class="shrink-0">
+          <source srcset="/media/about/walaa-ramadan.webp" type="image/webp" />
+          <img src="/media/about/walaa-ramadan.jpg" alt={site.person} width="64" height="64" loading="lazy" decoding="async" class="size-16 rounded-xl object-cover" />
+        </picture>
+        <span>
+          <span class="block font-display text-lg font-medium leading-tight">{site.person}</span>
+          <span class="mt-1 block text-xs leading-snug text-ink-soft">Industrial designer turned 3D product animator</span>
+        </span>
+      </a>
     </div>
     <div class="lg:col-span-6 lg:col-start-7">
       <SectionHeader eyebrow="Why work with me" title="More than animation. I understand products." id="why-title" intro="With a background in industrial design, I approach product animation from both a visual and product-development perspective. I combine 3D design, visualization and AI-assisted workflows to create engaging product content." />

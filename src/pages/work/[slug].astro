@@ -23,7 +23,7 @@ const service = getService(serviceSlug)!;
 const main = project.media[0];
 
 const frameFor = (aspect: string) =>
-  aspect === 'portrait' ? 'aspect-[9/16] h-[min(80vh,56rem)] max-w-full' : aspect === 'cinema' ? 'aspect-[992/432]' : 'aspect-video';
+  aspect === 'portrait' ? 'aspect-[9/16] h-[min(80vh,56rem)] max-w-full' : aspect === 'cinema' ? 'aspect-[1920/836]' : 'aspect-video';
 
 const schema = project.media.map((m) => ({
   '@context': 'https://schema.org',

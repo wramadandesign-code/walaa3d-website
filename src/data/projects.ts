@@ -55,8 +55,8 @@ export const projects: Project[] = [
     deliverables: ['Product reveal', 'X-ray / internal view', 'Feature animation', 'Social-media cut'],
     formats: ['21:9 cinematic', '9:16 vertical'],
     media: [
-      { name: 'cleaning-robot', aspect: 'cinema', width: 992, height: 432, duration: 'PT15S', label: 'Cinematic master · 21:9' },
-      { name: 'cleaning-robot-vertical', aspect: 'portrait', width: 720, height: 1280, duration: 'PT15S', label: 'Social cut · 9:16' },
+      { name: 'cleaning-robot', aspect: 'cinema', width: 1920, height: 836, duration: 'PT15S', label: 'Cinematic master · 21:9' },
+      { name: 'cleaning-robot-vertical', aspect: 'portrait', width: 1080, height: 1920, duration: 'PT15S', label: 'Social cut · 9:16' },
     ],
   },
   {
@@ -79,7 +79,7 @@ export const projects: Project[] = [
       'A 15-second vertical film designed for social media and trade-show screens, showing both personality and function.',
     deliverables: ['Product reveal', 'Screen / UI animation', 'Detail close-ups'],
     formats: ['9:16 vertical'],
-    media: [{ name: 'service-robot', aspect: 'portrait', width: 720, height: 1280, duration: 'PT15S' }],
+    media: [{ name: 'service-robot', aspect: 'portrait', width: 1080, height: 1920, duration: 'PT15S' }],
   },
   {
     slug: 'smart-sensor-exploded-view-animation',
@@ -101,7 +101,7 @@ export const projects: Project[] = [
       'A clear, satisfying explainer that communicates build quality and technology in 15 seconds — ideal for launch campaigns and crowdfunding pages.',
     deliverables: ['Exploded view', 'Material close-ups', 'Display UI animation'],
     formats: ['9:16 vertical'],
-    media: [{ name: 'handheld-device', aspect: 'portrait', width: 720, height: 1280, duration: 'PT15S' }],
+    media: [{ name: 'handheld-device', aspect: 'portrait', width: 1080, height: 1920, duration: 'PT15S' }],
   },
   {
     slug: 'retail-assistant-robot-commercial',
@@ -123,7 +123,7 @@ export const projects: Project[] = [
       'A premium vertical film for the product launch and social channels, reusable for retail presentations.',
     deliverables: ['Product commercial', 'UI screen animation', 'Studio renders'],
     formats: ['9:16 vertical'],
-    media: [{ name: 'reception-robot', aspect: 'portrait', width: 720, height: 1280, duration: 'PT15S' }],
+    media: [{ name: 'reception-robot', aspect: 'portrait', width: 1080, height: 1920, duration: 'PT15S' }],
   },
   {
     slug: 'surgical-operating-table-mechanism-animation',
@@ -145,7 +145,7 @@ export const projects: Project[] = [
       'A complete product explainer designed for tenders, exhibitions and distributor training.',
     deliverables: ['Mechanism animation', 'Feature callouts', 'Accessory showcase'],
     formats: ['16:9 landscape'],
-    media: [{ name: 'operating-table', aspect: 'landscape', width: 598, height: 360, duration: 'PT1M22S' }],
+    media: [{ name: 'operating-table', aspect: 'landscape', width: 1196, height: 720, duration: 'PT1M22S' }],
   },
   {
     slug: 'electric-water-heater-product-visualization',
@@ -167,7 +167,7 @@ export const projects: Project[] = [
       'A 40-second product film plus hero stills for e-commerce listings and retail screens.',
     deliverables: ['Product film', 'Hero renders', 'Feature close-ups'],
     formats: ['16:9 landscape'],
-    media: [{ name: 'water-heater', aspect: 'landscape', width: 1280, height: 720, duration: 'PT40S' }],
+    media: [{ name: 'water-heater', aspect: 'landscape', width: 1920, height: 1080, duration: 'PT40S' }],
   },
 ];
 

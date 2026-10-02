@@ -3,6 +3,7 @@ import { originOf, abs } from '@/config/urls';
 import '@/styles/global.css';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
+import WhatsAppFab from '@/components/WhatsAppFab.astro';
 import { site } from '@/config/site';
 
 interface Props {
@@ -37,6 +38,7 @@ const baseSchema: Record<string, unknown>[] = [
     logo: `${origin}/brand/mark-512.png`,
     image: `${origin}${site.ogImage}`,
     email: site.contact.email,
+    telephone: site.contact.phone,
     areaServed: 'Worldwide',
     founder: { '@id': `${origin}/#person` },
     knowsAbout: ['3D product animation', 'Product visualization', '3D rendering', 'Exploded view animation', 'Industrial design'],
@@ -48,6 +50,9 @@ const baseSchema: Record<string, unknown>[] = [
     '@id': `${origin}/#person`,
     name: site.person,
     jobTitle: site.jobTitle,
+    image: `${origin}/media/about/walaa-ramadan.jpg`,
+    email: site.contact.email,
+    telephone: site.contact.phone,
     url: `${origin}/about/`,
     worksFor: { '@id': `${origin}/#business` },
     ...(sameAs.length ? { sameAs } : {}),
@@ -110,6 +115,7 @@ if (breadcrumbs?.length) {
       <slot />
     </main>
     <Footer />
+    <WhatsAppFab />
 
     <script>
       import '@/scripts/site';

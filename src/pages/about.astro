@@ -30,12 +30,29 @@ const schema = [{ '@context': 'https://schema.org', '@type': 'AboutPage', name: 
       </div>
       <a href="/contact/" class="btn btn-gold mt-10" data-reveal>Start a Project</a>
     </div>
-    <!-- TODO: replace with Walaa's portrait: add /public/media/about/portrait.webp and swap this block for an <img> -->
-    <div class="lg:col-span-5 lg:col-start-8" data-reveal>
-      <div class="aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-night">
-        <VideoLoop name="service-robot" label="Service robot — 3D product animation by Walaa" width={720} height={1280} />
-      </div>
-    </div>
+    <figure class="relative lg:col-span-5 lg:col-start-8" data-reveal>
+      <picture>
+        <source srcset="/media/about/walaa-ramadan.webp" type="image/webp" />
+        <img
+          src="/media/about/walaa-ramadan.jpg"
+          alt={`${site.person}, 3D product animator and industrial designer`}
+          width="800"
+          height="800"
+          fetchpriority="high"
+          decoding="async"
+          class="aspect-square w-full rounded-[1.75rem] bg-mist object-cover ring-1 ring-line"
+        />
+      </picture>
+      <figcaption class="absolute -bottom-6 left-6 right-6 flex items-center gap-4 rounded-2xl bg-surface/95 p-4 shadow-xl ring-1 ring-line backdrop-blur sm:left-auto sm:-right-6 sm:max-w-xs">
+        <div class="size-14 shrink-0 overflow-hidden rounded-xl bg-night">
+          <VideoLoop name="handheld-device" label="Exploded view animation by Walaa" width={1080} height={1920} />
+        </div>
+        <div>
+          <p class="font-display text-lg font-medium leading-tight">{site.person}</p>
+          <p class="mt-0.5 text-xs uppercase tracking-[0.14em] text-ink-soft">3D Product Animator</p>
+        </div>
+      </figcaption>
+    </figure>
   </section>
 
   <section class="border-y border-line bg-mist/60 py-24 sm:py-28" aria-labelledby="values-title">

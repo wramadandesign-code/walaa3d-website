@@ -3,8 +3,8 @@
 //   node scripts/process-video.mjs <input.mp4> <name> [posterSec=3] [loopStartSec=0] [loopDurSec=15]
 //
 // Writes to public/media:
-//   video/<name>.mp4             full video (H.264, audio kept, web-optimized)
-//   video/<name>-loop.webm|.mp4  muted preview loop, max 960px wide
+//   video/<name>.mp4             full video (H.264, audio kept, long side max 1920px)
+//   video/<name>-loop.webm|.mp4  muted preview loop, long side max 1600px
 //   posters/<name>.webp|.jpg     poster frame (webp for the page, jpg for OG/schema)
 //
 // Needs ffmpeg on PATH, or set FFMPEG=/full/path/to/ffmpeg.
@@ -29,12 +29,14 @@ const run = (label, args) => {
   if (r.status !== 0) process.exit(r.status ?? 1);
 };
 
-const loopIn = ['-ss', loopStart, '-t', loopDur, '-i', input, '-an', '-vf', "scale='min(iw,960)':-2"];
+// Cap the LONG side (works for 16:9, 21:9 and 9:16 sources alike).
+const fit = (max) => `scale='if(gte(iw,ih),min(iw,${max}),-2)':'if(gte(iw,ih),-2,min(ih,${max}))'`;
+const loopIn = ['-ss', loopStart, '-t', loopDur, '-i', input, '-an', '-vf', fit(1600)];
 
-run('full mp4', ['-i', input, '-c:v', 'libx264', '-preset', 'slow', '-crf', '21', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-vf', "scale='min(iw,1920)':-2", '-c:a', 'aac', '-b:a', '128k', `${V}/${name}.mp4`]);
-run('loop mp4', [...loopIn, '-c:v', 'libx264', '-preset', 'slow', '-crf', '26', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', `${V}/${name}-loop.mp4`]);
+run('full mp4', ['-i', input, '-c:v', 'libx264', '-preset', 'slow', '-crf', '21', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-vf', fit(1920), '-c:a', 'aac', '-b:a', '128k', `${V}/${name}.mp4`]);
+run('loop mp4', [...loopIn, '-c:v', 'libx264', '-preset', 'slow', '-crf', '27', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', `${V}/${name}-loop.mp4`]);
 run('loop webm', [...loopIn, '-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '36', '-row-mt', '1', `${V}/${name}-loop.webm`]);
-run('poster webp', ['-ss', posterSec, '-i', input, '-frames:v', '1', '-vf', "scale='min(iw,1600)':-2", '-c:v', 'libwebp', '-quality', '82', `${P}/${name}.webp`]);
-run('poster jpg', ['-ss', posterSec, '-i', input, '-frames:v', '1', '-vf', "scale='min(iw,1600)':-2", '-q:v', '3', `${P}/${name}.jpg`]);
+run('poster webp', ['-ss', posterSec, '-i', input, '-frames:v', '1', '-vf', fit(1600), '-c:v', 'libwebp', '-quality', '82', `${P}/${name}.webp`]);
+run('poster jpg', ['-ss', posterSec, '-i', input, '-frames:v', '1', '-vf', fit(1600), '-q:v', '3', `${P}/${name}.jpg`]);
 
 console.log(`\nDone. Reference it in src/data/projects.ts as media name "${name}" (update width/height/duration).`);

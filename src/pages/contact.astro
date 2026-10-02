@@ -3,7 +3,7 @@ import { originOf } from '@/config/urls';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ContactForm from '@/components/ContactForm.astro';
 import Icon from '@/components/Icon.astro';
-import { site, whatsappUrl } from '@/config/site';
+import { site, whatsappUrl, telUrl } from '@/config/site';
 import { process } from '@/data/services';
 
 const wa = whatsappUrl();
@@ -34,6 +34,10 @@ const schema = [{ '@context': 'https://schema.org', '@type': 'ContactPage', name
             <span><span class="block text-xs uppercase tracking-[0.14em] text-ink-faint">WhatsApp</span><span class="font-medium">Chat directly</span></span>
           </a>
         )}
+        <a href={telUrl} class="flex items-center gap-4 rounded-2xl bg-surface p-4 ring-1 ring-line transition-all hover:ring-gold">
+          <span class="grid size-11 place-items-center rounded-full bg-gold-pale text-gold-deep"><Icon name="phone" /></span>
+          <span><span class="block text-xs uppercase tracking-[0.14em] text-ink-faint">Call</span><span class="font-medium" dir="ltr">{site.contact.phoneDisplay}</span></span>
+        </a>
       </div>
 
       <div class="mt-12 hidden lg:block" data-reveal>
