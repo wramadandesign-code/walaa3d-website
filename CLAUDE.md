@@ -67,6 +67,12 @@ public/brand/             logo.svg, mark.svg, mark-512.png
 source-media/             original WhatsApp videos + brief (git-ignored, never deployed)
 ```
 
+## Blog & AI-search (GEO)
+
+- Posts: `src/content/blog/<slug>.md` (content collection in `src/content.config.ts`). Frontmatter: title, seoTitle (keep total <title> ≤ 60), description (120–165), **summary** (answer-first, 1–2 sentences), cover (media name), takeaways[], faqs[], related[] (project slugs). The page renders TOC, takeaways, FAQ + BlogPosting/FAQPage JSON-LD automatically; RSS at `/rss.xml`; latest 2 posts show on the homepage.
+- Writing rules: target one main keyword per post; open with a direct definition/answer; question-style H2s; internal links to services, projects and /contact/; no invented statistics, clients or prices.
+- AI assistants: `/llms.txt` + `/llms-full.txt` are generated from site data (`src/lib/llms.ts`) — update data, not the files. `robots.txt` explicitly allows AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended…). Business/Person JSON-LD (address, contactPoint, services catalog, sameAs) lives in BaseLayout; About page has a "Quick facts" block — keep it factual.
+
 ## Design system
 
 - Colours (Tailwind names): `canvas` #ECECEA page bg · `surface` #F6F6F4 cards · `mist` alt sections · `line` borders · `ink` #151515 text · `ink-soft` secondary text · `ink-faint` meta (large text only) · `night` video frames · `gold` #DCC28A buttons · `gold-light` hover · `gold-pale` tints · `gold-deep` #8C6D33 for gold **text** on light backgrounds (AA contrast). Never put `gold` text on `canvas`.

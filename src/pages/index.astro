@@ -7,9 +7,13 @@ import SectionHeader from '@/components/SectionHeader.astro';
 import CtaBand from '@/components/CtaBand.astro';
 import Faq from '@/components/Faq.astro';
 import Icon from '@/components/Icon.astro';
+import PostCard from '@/components/PostCard.astro';
+import { getPosts } from '@/lib/blog';
 import { projects } from '@/data/projects';
 import { services, process, generalFaqs } from '@/data/services';
 import { site } from '@/config/site';
+
+const latestPosts = (await getPosts()).slice(0, 2);
 
 const [p1, p2, p3, p4, p5, p6] = projects;
 const hero = p1.media[0];
@@ -213,6 +217,18 @@ const schema = [
       </ol>
     </div>
   </section>
+
+  {latestPosts.length > 0 && (
+    <section class="container-x pt-24 sm:pt-32" aria-labelledby="insights-title">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <SectionHeader eyebrow="Insights" title="Guides for launching products in 3D" id="insights-title" />
+        <a href="/blog/" class="btn btn-ghost" data-reveal>All articles <Icon name="arrow" class="arrow size-4" /></a>
+      </div>
+      <div class="mt-12 grid gap-x-8 gap-y-16 md:grid-cols-2">
+        {latestPosts.map((p, i) => <PostCard post={p} headingLevel="h3" featured={latestPosts.length === 1 && i === 0} />)}
+      </div>
+    </section>
+  )}
 
   <Faq items={generalFaqs} />
 

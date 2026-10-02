@@ -1,0 +1,56 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import PostCard from '@/components/PostCard.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { getPosts } from '@/lib/blog';
+import { originOf } from '@/config/urls';
+import { site } from '@/config/site';
+
+const posts = await getPosts();
+const origin = originOf(Astro.site!);
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    '@id': `${origin}/blog/#blog`,
+    name: `${site.brand} — Insights`,
+    description: 'Guides and insights on 3D product animation, product visualization and launching products with CGI.',
+    url: `${origin}/blog/`,
+    inLanguage: 'en',
+    publisher: { '@id': `${origin}/#business` },
+    blogPost: posts.map((p) => ({
+      '@type': 'BlogPosting',
+      headline: p.data.title,
+      url: `${origin}/blog/${p.id}/`,
+      datePublished: p.data.pubDate.toISOString(),
+      author: { '@id': `${origin}/#person` },
+    })),
+  },
+];
+---
+
+<BaseLayout
+  title="3D Product Animation Blog & Guides"
+  description="Guides on 3D product animation and product visualization: how it works, costs, timelines, exploded views, CAD preparation and launching products with CGI."
+  breadcrumbs={[{ name: 'Blog', href: '/blog/' }]}
+  schema={schema}
+>
+
+  <section class="container-x pb-12 pt-36 sm:pt-44">
+    <SectionHeader as="h1" eyebrow="Blog" title="Insights on 3D product animation" intro="Practical guides for brands, startups and manufacturers — how 3D product animation works, what it costs, and how to use it to launch and sell products." />
+  </section>
+
+  <section class="container-x" aria-label="Articles">
+    {posts.length ? (
+      <div class="grid gap-x-8 gap-y-16 md:grid-cols-2">
+        {posts.map((post, i) => <PostCard post={post} featured={i === 0} />)}
+      </div>
+    ) : (
+      <p class="prose-body">New articles are coming soon.</p>
+    )}
+  </section>
+
+  <CtaBand />
+</BaseLayout>

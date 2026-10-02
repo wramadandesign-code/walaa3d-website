@@ -121,3 +121,26 @@
 details > summary { list-style: none; }
 details > summary::-webkit-details-marker { display: none; }
 details[open] .faq-icon { transform: rotate(45deg); }
+
+/* Blog article typography (markdown output) */
+.article { @apply text-[1.0625rem] leading-[1.8] text-ink-soft sm:text-lg; }
+.article > * + * { margin-top: 1.25em; }
+.article h2 { @apply mt-16 scroll-mt-28 font-display text-3xl font-medium leading-tight text-ink sm:text-[2.125rem]; }
+.article h3 { @apply mt-10 scroll-mt-28 font-display text-2xl font-medium leading-snug text-ink; }
+.article h2 + *, .article h3 + * { margin-top: 0.75em; }
+.article strong { @apply font-semibold text-ink; }
+.article a { @apply font-medium text-ink underline decoration-gold decoration-2 underline-offset-4 transition-colors hover:text-gold-deep; }
+.article ul, .article ol { @apply space-y-2 pl-6; }
+.article ul { list-style: disc; }
+.article ol { list-style: decimal; }
+.article li::marker { @apply text-gold-deep; }
+.article li > p { margin: 0; }
+.article ul.contains-task-list { @apply list-none space-y-2 rounded-2xl bg-surface p-6 ring-1 ring-line; }
+.article .task-list-item { @apply flex items-start gap-3; }
+.article .task-list-item input { @apply mt-1.5 size-4 shrink-0 accent-gold-deep; }
+.article blockquote { @apply border-l-2 border-gold pl-5 italic text-ink; }
+.article table { @apply block w-full overflow-x-auto text-base sm:table; border-collapse: collapse; }
+.article th { @apply border-b border-ink/20 bg-surface px-4 py-3 text-left font-display font-medium text-ink; }
+.article td { @apply border-b border-line px-4 py-3 align-top; }
+.article hr { @apply my-12 border-line; }
+.article code { @apply rounded bg-surface px-1.5 py-0.5 text-[0.9em] text-ink ring-1 ring-line; }

@@ -5,6 +5,7 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import WhatsAppFab from '@/components/WhatsAppFab.astro';
 import { site } from '@/config/site';
+import { services } from '@/data/services';
 
 interface Props {
   /** Page title without brand suffix. Omit on the homepage to use the full SEO title. */
@@ -39,9 +40,18 @@ const baseSchema: Record<string, unknown>[] = [
     image: `${origin}${site.ogImage}`,
     email: site.contact.email,
     telephone: site.contact.phone,
-    areaServed: 'Worldwide',
+    slogan: 'Bring your product to life in 3D',
+    address: { '@type': 'PostalAddress', addressLocality: 'Cairo', addressCountry: 'EG' },
+    areaServed: { '@type': 'Place', name: 'Worldwide' },
+    availableLanguage: ['English', 'Arabic'],
+    contactPoint: { '@type': 'ContactPoint', contactType: 'sales', email: site.contact.email, telephone: site.contact.phone, url: `${origin}/contact/`, availableLanguage: ['English', 'Arabic'] },
     founder: { '@id': `${origin}/#person` },
-    knowsAbout: ['3D product animation', 'Product visualization', '3D rendering', 'Exploded view animation', 'Industrial design'],
+    knowsAbout: ['3D product animation', 'Product visualization', '3D rendering', 'CGI product video', 'Exploded view animation', 'Mechanism animation', 'Product launch video', 'Industrial design', 'CAD visualization'],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: '3D product animation & visualization services',
+      itemListElement: services.map((sv) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: sv.title, description: sv.short, url: `${origin}/services/${sv.slug}/` } })),
+    },
     ...(sameAs.length ? { sameAs } : {}),
   },
   {
@@ -50,6 +60,9 @@ const baseSchema: Record<string, unknown>[] = [
     '@id': `${origin}/#person`,
     name: site.person,
     jobTitle: site.jobTitle,
+    description: `${site.person} is a 3D product animator with a background in industrial design, creating cinematic 3D product animations and product visualizations for brands, startups and manufacturers.`,
+    knowsAbout: ['3D product animation', 'Product visualization', 'Industrial design', '3D modeling', 'CGI'],
+    address: { '@type': 'PostalAddress', addressLocality: 'Cairo', addressCountry: 'EG' },
     image: `${origin}/media/about/walaa-ramadan.jpg`,
     email: site.contact.email,
     telephone: site.contact.phone,
@@ -83,7 +96,7 @@ if (breadcrumbs?.length) {
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="robots" content={noindex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />
     <meta name="author" content={site.person} />
     <meta name="theme-color" content={site.themeColor} />
 
@@ -91,6 +104,8 @@ if (breadcrumbs?.length) {
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Walaa 3D Animation — Blog" href="/rss.xml" />
+    <link rel="help" type="text/plain" href="/llms.txt" title="LLM-readable site summary" />
 
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content={site.brand} />

@@ -70,6 +70,32 @@ const schema = [{ '@context': 'https://schema.org', '@type': 'AboutPage', name: 
     </div>
   </section>
 
+  <section class="container-x pt-24" aria-labelledby="facts-title">
+    <div class="grid gap-10 lg:grid-cols-12">
+      <div class="lg:col-span-4" data-reveal>
+        <p class="eyebrow">At a glance</p>
+        <h2 id="facts-title" class="mt-5 font-display text-4xl font-medium">Quick facts</h2>
+      </div>
+      <dl class="grid gap-px overflow-hidden rounded-[1.5rem] bg-line ring-1 ring-line sm:grid-cols-2 lg:col-span-8" data-reveal>
+        {[
+          ['Who', `${site.person} — 3D product animator & industrial designer`],
+          ['Studio', `${site.brand}, based in Cairo, Egypt`],
+          ['Clients', 'Brands, startups and manufacturers worldwide (remote collaboration in English)'],
+          ['Main service', '3D product animation: commercials, reveals, exploded views, mechanism and launch videos'],
+          ['Also', 'Photoreal product visualization and product & industrial design support'],
+          ['Input', 'CAD files (STEP, IGES, SolidWorks, Rhino, OBJ, FBX) or photos and sketches'],
+          ['Delivery', 'MP4 in 16:9, 9:16, 1:1 and 4:5, up to 4K, plus still renders'],
+          ['Contact', `${site.contact.email} · ${site.contact.phoneDisplay}`],
+        ].map(([k, v]) => (
+          <div class="bg-surface p-6">
+            <dt class="text-xs uppercase tracking-[0.14em] text-ink-faint">{k}</dt>
+            <dd class="mt-2 leading-relaxed text-ink">{v}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
   <section class="container-x grid gap-10 py-24 lg:grid-cols-12" aria-labelledby="industries-title">
     <div class="lg:col-span-4">
       <p class="eyebrow">Industries</p>

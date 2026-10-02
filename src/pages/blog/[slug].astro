@@ -1,0 +1,159 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import Faq from '@/components/Faq.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { getPosts, readingMinutes, wordCount, formatDate, type Post } from '@/lib/blog';
+import { projects } from '@/data/projects';
+import { site } from '@/config/site';
+import { originOf, abs } from '@/config/urls';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+interface Props { post: Post }
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const d = post.data;
+const origin = originOf(Astro.site!);
+const url = `${origin}/blog/${post.id}/`;
+const toc = headings.filter((h) => h.depth === 2);
+const related = d.related.map((slug) => projects.find((p) => p.slug === slug)).filter((p): p is (typeof projects)[number] => Boolean(p));
+const modified = d.updatedDate ?? d.pubDate;
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    '@id': `${url}#article`,
+    headline: d.title,
+    description: d.description,
+    abstract: d.summary,
+    image: [abs(Astro.site!, `/media/posters/${d.cover}.jpg`)],
+    datePublished: d.pubDate.toISOString(),
+    dateModified: modified.toISOString(),
+    author: { '@id': `${origin}/#person` },
+    publisher: { '@id': `${origin}/#business` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    isPartOf: { '@id': `${origin}/blog/#blog` },
+    articleSection: d.category,
+    keywords: d.tags.join(', '),
+    wordCount: wordCount(post),
+    inLanguage: 'en',
+  },
+  ...(d.faqs.length
+    ? [{
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: d.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+      }]
+    : []),
+];
+---
+
+<BaseLayout
+  title={d.seoTitle ?? d.title}
+  description={d.description}
+  image={`/media/posters/${d.cover}.jpg`}
+  type="article"
+  breadcrumbs={[{ name: 'Blog', href: '/blog/' }, { name: d.title, href: `/blog/${post.id}/` }]}
+  schema={schema}
+>
+  <Fragment slot="head">
+    <meta property="article:published_time" content={d.pubDate.toISOString()} />
+    <meta property="article:modified_time" content={modified.toISOString()} />
+    <meta property="article:author" content={site.person} />
+    <meta property="article:section" content={d.category} />
+    {d.tags.map((t) => <meta property="article:tag" content={t} />)}
+    <link rel="preload" as="image" href={`/media/posters/${d.cover}.webp`} fetchpriority="high" />
+  </Fragment>
+
+  <article>
+    <header class="container-x pt-32 sm:pt-40">
+      <nav aria-label="Breadcrumb" class="text-sm text-ink-soft" data-reveal>
+        <a href="/blog/" class="link-underline">Blog</a> <span class="mx-2 text-ink-faint">/</span> <span>{d.category}</span>
+      </nav>
+      <div class="mt-8 max-w-4xl">
+        <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs uppercase tracking-[0.14em] text-ink-soft" data-reveal>
+          <span class="text-gold-deep">{d.category}</span>
+          <span>Published <time datetime={d.pubDate.toISOString()}>{formatDate(d.pubDate)}</time></span>
+          {d.updatedDate && <span>Updated <time datetime={d.updatedDate.toISOString()}>{formatDate(d.updatedDate)}</time></span>}
+          <span>{readingMinutes(post)} min read</span>
+        </p>
+        <h1 class="mt-5 font-display text-[clamp(2.4rem,5.5vw,4.75rem)] font-medium leading-[1.02] tracking-[-0.025em]" data-reveal>{d.title}</h1>
+        <p class="mt-6 max-w-3xl text-lg leading-relaxed text-ink-soft sm:text-xl" data-reveal>{d.summary}</p>
+        <a href="/about/" class="mt-8 inline-flex items-center gap-3" data-reveal>
+          <picture>
+            <source srcset="/media/about/walaa-ramadan.webp" type="image/webp" />
+            <img src="/media/about/walaa-ramadan.jpg" alt="" width="44" height="44" class="size-11 rounded-full object-cover" />
+          </picture>
+          <span class="text-sm leading-tight"><span class="block font-medium">{site.person}</span><span class="text-ink-soft">3D Product Animator & Industrial Designer</span></span>
+        </a>
+      </div>
+      <figure class="mt-12 overflow-hidden rounded-[1.75rem] bg-night" data-reveal>
+        <picture>
+          <source srcset={`/media/posters/${d.cover}.webp`} type="image/webp" />
+          <img src={`/media/posters/${d.cover}.jpg`} alt={d.coverAlt} width="1600" height="697" fetchpriority="high" class="aspect-[16/8] w-full object-cover sm:aspect-[21/9]" />
+        </picture>
+      </figure>
+    </header>
+
+    <div class="container-x grid gap-12 py-16 lg:grid-cols-12 lg:py-20">
+      <aside class="lg:col-span-3" aria-label="Table of contents">
+        <div class="lg:sticky lg:top-28">
+          <p class="eyebrow">On this page</p>
+          <ol class="mt-5 space-y-2.5 border-l border-line pl-4 text-sm">
+            {toc.map((h) => <li><a href={`#${h.slug}`} class="text-ink-soft transition-colors hover:text-ink">{h.text}</a></li>)}
+          </ol>
+          <a href="/contact/" class="btn btn-gold mt-8 hidden lg:inline-flex">Start a Project <Icon name="arrow" class="arrow size-4" /></a>
+        </div>
+      </aside>
+
+      <div class="min-w-0 lg:col-span-8 lg:col-start-5">
+        {d.takeaways.length > 0 && (
+          <section class="mb-12 rounded-[1.5rem] bg-gold-pale/70 p-6 ring-1 ring-gold-light sm:p-8" aria-labelledby="takeaways-title">
+            <h2 id="takeaways-title" class="font-display text-xl font-medium">Key takeaways</h2>
+            <ul class="mt-4 space-y-3">
+              {d.takeaways.map((t) => <li class="flex gap-3 leading-relaxed"><Icon name="check" class="mt-1 size-4 shrink-0 text-gold-deep" />{t}</li>)}
+            </ul>
+          </section>
+        )}
+
+        <div class="article">
+          <Content />
+        </div>
+
+        <aside class="mt-16 flex flex-col gap-5 rounded-[1.5rem] bg-surface p-6 ring-1 ring-line sm:flex-row sm:items-center sm:p-8" aria-label="About the author">
+          <picture class="shrink-0">
+            <source srcset="/media/about/walaa-ramadan.webp" type="image/webp" />
+            <img src="/media/about/walaa-ramadan.jpg" alt={site.person} width="96" height="96" loading="lazy" class="size-24 rounded-2xl object-cover" />
+          </picture>
+          <div>
+            <p class="text-xs uppercase tracking-[0.14em] text-ink-soft">Written by</p>
+            <p class="mt-1 font-display text-2xl font-medium">{site.person}</p>
+            <p class="mt-2 leading-relaxed text-ink-soft">3D product animator with a background in industrial design, creating cinematic product animations and visualizations for brands, startups and manufacturers.</p>
+            <a href="/about/" class="mt-3 inline-flex items-center gap-2 text-sm font-medium">About Walaa <Icon name="arrow" class="size-4" /></a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </article>
+
+  {d.faqs.length > 0 && <Faq items={d.faqs} title="Questions about this topic" />}
+
+  {related.length > 0 && (
+    <section class="container-x pb-8" aria-labelledby="related-title">
+      <p class="eyebrow">Examples</p>
+      <h2 id="related-title" class="mt-5 font-display text-4xl font-medium">See it in real projects</h2>
+      <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {related.map((p) => <ProjectCard project={p} mediaIndex={p.media.length > 1 ? 1 : 0} />)}
+      </div>
+    </section>
+  )}
+
+  <CtaBand />
+</BaseLayout>

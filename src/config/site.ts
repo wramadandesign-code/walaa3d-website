@@ -49,6 +49,7 @@ export const nav = [
   { label: 'Services', href: '/services/' },
   { label: 'Process', href: '/#process' },
   { label: 'About', href: '/about/' },
+  { label: 'Blog', href: '/blog/' },
 ] as const;
 
 export const telUrl = `tel:${site.contact.phone}`;
