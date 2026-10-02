@@ -1,0 +1,922 @@
+[
+  {
+    "id": "Walaa3dBlogAuto1",
+    "name": "WALAA3D-01: blog autopost (Mon/Wed/Fri)",
+    "nodes": [
+      {
+        "id": "w3d-0",
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 9 * * 1,3,5"
+              }
+            ]
+          }
+        },
+        "name": "Mon/Wed/Fri 09:00",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          2340,
+          300
+        ]
+      },
+      {
+        "id": "w3d-1",
+        "parameters": {},
+        "name": "Run now (manual)",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          500
+        ]
+      },
+      {
+        "id": "w3d-2",
+        "parameters": {
+          "jsCode": "\nconst RAW = 'https://raw.githubusercontent.com/wramadandesign-code/walaa3d-website/main/';\nconst http = (url) => this.helpers.httpRequest({ url, headers: { 'User-Agent': 'walaa3d-autopost' } });\nconst text = async (path) => { const r = await http(RAW + path + '?t=' + Date.now()); return typeof r === 'string' ? r : JSON.stringify(r); };\n\nconst backlog = JSON.parse(await text('content/backlog.json'));\nconst files = await http('https://api.github.com/repos/wramadandesign-code/walaa3d-website/contents/src/content/blog?ref=main');\nconst existing = new Set(files.map((f) => f.name.replace(/\\.md$/, '')));\nconst remaining = backlog.topics.filter((t) => !existing.has(t.slug));\nif (!remaining.length) return [{ json: { empty: true } }];\nconst topic = remaining[0];\n\nconst projectsTs = await text('src/data/projects.ts');\nconst projects = [...projectsTs.matchAll(/slug: '([^']+)',\\s*number: '\\d+',\\s*title: '([^']+)',\\s*type: '([^']+)'/g)].map((m) => ({ slug: m[1], title: m[2] + ' — ' + m[3] }));\nconst servicesTs = await text('src/data/services.ts');\nconst services = [...servicesTs.matchAll(/slug: '([^']+)',\\s*key: '[^']+',\\s*icon: '[^']+',\\s*title: '([^']+)'/g)].map((m) => ({ slug: m[1], title: m[2] }));\nconst rss = await http('https://walaa3d.studio/rss.xml?t=' + Date.now());\nconst posts = [...String(rss).matchAll(/<item><title>([^<]+)<\\/title><link>https:\\/\\/walaa3d\\.studio(\\/blog\\/[^<]+)<\\/link>/g)].map((m) => ({ url: m[2], title: m[1] }));\n\nconst links = [\n  { url: '/', title: 'Homepage' }, { url: '/work/', title: 'Portfolio' }, { url: '/services/', title: 'All services' },\n  { url: '/about/', title: 'About Walaa Ramadan' }, { url: '/contact/', title: 'Start a project (contact form)' }, { url: '/blog/', title: 'Blog' },\n  ...services.map((s) => ({ url: '/services/' + s.slug + '/', title: 'Service: ' + s.title })),\n  ...projects.map((p) => ({ url: '/work/' + p.slug + '/', title: 'Project: ' + p.title })),\n  ...posts.map((p) => ({ url: p.url, title: 'Article: ' + p.title })),\n];\n\nconst covers = {\n  'cleaning-robot': 'a white autonomous floor-cleaning robot following glowing navigation path lines on a dark floor (3D render)',\n  'cleaning-robot-vertical': 'an autonomous cleaning robot under three spotlights in a dark industrial hall (3D render)',\n  'service-robot': 'a glossy black restaurant service robot with a smiling face display and blue light strips (3D render)',\n  'reception-robot': 'a grey retail assistant robot kiosk with a curved body and touchscreen in a bright studio (3D render)',\n  'handheld-device': 'an exploded view of a compact smart sensor showing its shell, flexible circuit and gold-lit circuit board (3D render)',\n  'operating-table': 'a surgical operating table with adjustable padded sections on a white background (3D render)',\n  'water-heater': 'a close-up of the temperature gauge on a white electric water heater (3D render)',\n};\n\nconst reference = (await text('src/content/blog/what-is-3d-product-animation.md')).split(/\\n---\\n/).slice(1).join('\\n---\\n');\n\nconst system = [\n  'You write articles for the blog of Walaa 3D Animation (https://walaa3d.studio): the 3D product animation and product visualization studio of Walaa Ramadan, a 3D product animator with an industrial-design background based in Cairo, Egypt, working remotely with brands, startups and manufacturers worldwide.',\n  'Services: 3D product animation (commercials, reveals, feature animations, exploded views, mechanism animations, social-media and launch videos); product visualization (hero, e-commerce, marketing and lifestyle renders); product & industrial design support (concepts, 3D/CAD support).',\n  'Process: Brief -> Concept -> Production (3D visualization + AI-assisted animation + compositing) -> Review -> Delivery. Accepts CAD (STEP, IGES, SolidWorks, Rhino, OBJ, FBX) or photos/sketches/drawings; no physical sample needed. Delivers MP4 in 16:9, 9:16, 1:1 and 4:5 up to 4K, plus stills. A typical 15-30 second animation takes about 1-3 weeks.',\n  '',\n  'Write genuinely useful, expert and specific articles for marketing managers, founders and product teams. Be practical: explain how things work, decisions, steps, trade-offs and common mistakes. Clear international English, short paragraphs, no fluff, no hype.',\n  '',\n  'HARD RULES - an automatic checker rejects any article that breaks them:',\n  '1. Never mention any client or brand name. Refer to past work only through the project pages provided, by their generic product name.',\n  '2. Never state prices, price ranges, budgets, currencies or currency symbols.',\n  '3. Never use percentages or statistics; never cite studies, surveys, research or data (\"according to\", \"studies show\", \"a survey\"...); never invent facts, numbers, testimonials, awards or client results.',\n  '4. No external links at all. Internal links ONLY to URLs from the list provided, as markdown links with the exact path, e.g. [3D product animation](/services/3d-product-animation/). Use 4-8 internal links placed naturally. You must link to /contact/ (in the conclusion), to at least one /work/ project page from the related projects and to the most relevant /services/ page.',\n  '5. No H1 heading. Use 5-9 \"## \" H2 sections (question-style headings where natural) and \"### \" H3s where useful. The last H2 must be \"## Conclusion\", inviting readers to explore the relevant service and start a project.',\n  '6. Start the body with one bold sentence (or two) that directly answers the main question, then one short paragraph saying what the article covers.',\n  '7. Body length 1,300-2,000 words. Use bullet lists; add a markdown table or a \"- [ ] \" checklist only when genuinely useful.',\n  '8. Never write \"guarantee\", \"best in the world\", \"#1\" or \"number one\", and never refer to yourself as an AI.',\n  '9. Only describe services the studio actually offers (listed above). Never mention AR, VR, 3D viewers, configurators or interactive 3D experiences.',\n  '',\n  'OUTPUT: return ONLY one JSON object (no code fences, nothing before or after) with exactly these keys:',\n  '\"title\" (max 70 characters, contains the main keyword), \"seoTitle\" (max 40 characters, short version for the browser tab), \"description\" (meta description, 130-160 characters), \"summary\" (1-2 sentences, 150-350 characters, a direct quotable answer), \"tags\" (array of 4-6 short keyword phrases), \"coverAlt\" (alt text describing the cover image, 40-120 characters), \"takeaways\" (array of 4-5 complete sentences), \"faqs\" (array of 4-5 objects {\"q\": question ending with \"?\", \"a\": answer of 2-4 sentences, at least 100 characters}), \"body\" (the article body in markdown, following the rules above).',\n].join('\\n');\n\nconst user = [\n  'Write the next article.',\n  '',\n  'TOPIC: ' + topic.title,\n  'MAIN KEYWORD: ' + topic.keyword,\n  'ANGLE: ' + topic.angle,\n  'CATEGORY: ' + topic.category,\n  'COVER IMAGE (write coverAlt for it): ' + covers[topic.cover],\n  'RELATED PROJECTS TO REFERENCE (link at least one): ' + topic.related.map((s) => '/work/' + s + '/').join(', '),\n  '',\n  'ALLOWED INTERNAL LINKS (url - page):',\n  ...links.map((l) => l.url + ' - ' + l.title),\n  '',\n  'EXISTING ARTICLES (do not repeat them; link to them where relevant): ' + posts.map((p) => p.title).join(' | '),\n  '',\n  'STYLE REFERENCE - an existing article body from this blog. Match its structure, tone and depth, but write completely new content for the new topic:',\n  '<<<',\n  reference.trim(),\n  '>>>',\n].join('\\n');\n\nconst prompt = { system, messages: [{ role: 'user', content: user }] };\nconst today = new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' });\nreturn [{ json: { empty: false, topic, remaining: remaining.length - 1, nextTopic: remaining[1]?.title || null, links: links.map((l) => l.url), projectSlugs: projects.map((p) => p.slug), postTitles: posts.map((p) => p.title), today, prompt } }];\n"
+        },
+        "name": "Pick topic",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2600,
+          300
+        ],
+        "onError": "continueErrorOutput"
+      },
+      {
+        "id": "w3d-3",
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "has-topic",
+                "leftValue": "={{ !$json.empty }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "Has topic?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2860,
+          300
+        ]
+      },
+      {
+        "id": "w3d-4",
+        "parameters": {
+          "resource": "message",
+          "operation": "sendMessage",
+          "chatId": "1896671921",
+          "text": "⚠️ <b>walaa3d.studio blog</b>\nThe topic list is empty — no article was written today. Add topics to content/backlog.json.",
+          "additionalFields": {
+            "parse_mode": "HTML",
+            "disable_web_page_preview": false,
+            "appendAttribution": false
+          }
+        },
+        "name": "TG: queue empty",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          3120,
+          300
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "b6m3KPwrhfEC7KiL",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "id": "w3d-5",
+        "parameters": {
+          "method": "POST",
+          "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googlePalmApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({\n  systemInstruction: { parts: [{ text: $('Pick topic').first().json.prompt.system }] },\n  contents: $('Pick topic').first().json.prompt.messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),\n  generationConfig: { responseMimeType: 'application/json', temperature: 0.7, maxOutputTokens: 32768 }\n}) }}",
+          "options": {
+            "timeout": 300000
+          }
+        },
+        "name": "Write: Gemini fallback",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          260,
+          300
+        ],
+        "credentials": {
+          "googlePalmApi": {
+            "id": "NIpzrWVAKX3xX7Gs",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 10000,
+        "onError": "continueErrorOutput"
+      },
+      {
+        "id": "w3d-6",
+        "parameters": {
+          "jsCode": "\nconst r = $input.first().json || {};\nconst text = ((r.candidates && r.candidates[0] && r.candidates[0].content && r.candidates[0].content.parts) || []).map((p) => p.text || '').join('');\nreturn [{ json: { provider: 'gemini', text, error: text ? undefined : (r.error ? (r.error.message || JSON.stringify(r.error)) : 'Gemini returned no text') } }];\n"
+        },
+        "name": "Write: Gemini result",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          520,
+          300
+        ]
+      },
+      {
+        "id": "w3d-7",
+        "parameters": {
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({\n  model: 'nvidia/nemotron-3-super-120b-a12b:free',\n  models: ['nvidia/nemotron-3-super-120b-a12b:free','google/gemma-4-31b-it:free','z-ai/glm-5.2:free'],\n  temperature: 0.7,\n  response_format: { type: 'json_object' },\n  messages: [{ role: 'system', content: $('Pick topic').first().json.prompt.system }].concat($('Pick topic').first().json.prompt.messages)\n}) }}",
+          "options": {
+            "timeout": 300000
+          }
+        },
+        "name": "Write: OpenRouter",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          780,
+          300
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "HnlWZAZ802Ij2PtX",
+            "name": "OpenRouter API"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 10000,
+        "onError": "continueErrorOutput"
+      },
+      {
+        "id": "w3d-8",
+        "parameters": {
+          "jsCode": "\nconst r = $input.first().json || {};\nconst text = (r.choices && r.choices[0] && r.choices[0].message && r.choices[0].message.content) || '';\nconst err = r.error ? (r.error.message || JSON.stringify(r.error)) : (text ? undefined : 'OpenRouter returned no text');\nreturn [{ json: { provider: 'openrouter:' + (r.model || '?'), text, error: err } }];\n"
+        },
+        "name": "Write: OpenRouter result",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1040,
+          300
+        ]
+      },
+      {
+        "id": "w3d-9",
+        "parameters": {
+          "jsCode": "\nconst ctx = $('Pick topic').first().json;\nconst errors = [];\nconst resp = $input.first().json;\nlet raw = String(resp.text || '').replace(/^\\s*\\x60{3}(?:json)?\\s*/i, '').replace(/\\s*\\x60{3}\\s*$/, '');\nif (resp.error && !raw) errors.push('AI provider error: ' + resp.error);\nlet d = {};\nif (!errors.length) try { d = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch (e) { errors.push('Output was not one valid JSON object: ' + e.message); }\n\nconst t = ctx.topic;\nconst need = (c, m) => { if (!c) errors.push(m); };\nconst len = (s) => String(s || '').length;\nif (!errors.length) {\n  need(len(d.title) >= 20 && len(d.title) <= 70, 'title must be 20-70 characters (is ' + len(d.title) + ')');\n  need(len(d.seoTitle) >= 10 && len(d.seoTitle) <= 40, 'seoTitle must be 15-40 characters (is ' + len(d.seoTitle) + ')');\n  need(len(d.description) >= 120 && len(d.description) <= 165, 'description must be 120-165 characters (is ' + len(d.description) + ')');\n  need(len(d.summary) >= 120 && len(d.summary) <= 420, 'summary must be 120-420 characters (is ' + len(d.summary) + ')');\n  need(Array.isArray(d.tags) && d.tags.length >= 3 && d.tags.length <= 8, 'tags must have 3-8 items');\n  need(len(d.coverAlt) >= 20, 'coverAlt too short');\n  need(Array.isArray(d.takeaways) && d.takeaways.length >= 3 && d.takeaways.length <= 6, 'takeaways must have 3-6 items');\n  need(Array.isArray(d.faqs) && d.faqs.length >= 3 && d.faqs.length <= 6, 'faqs must have 3-6 items');\n  (d.faqs || []).forEach((f, i) => need(String(f.q || '').trim().endsWith('?') && len(f.a) >= 80, 'faq ' + (i + 1) + ': question must end with \"?\" and answer be at least 80 characters'));\n  const body = String(d.body || '');\n  const wc = body.split(/\\s+/).filter(Boolean).length;\n  need(wc >= 1100 && wc <= 2800, 'body must be 1,100-2,800 words (is ' + wc + ')');\n  need(!/^#\\s/m.test(body), 'body must not contain an H1 (\"# \")');\n  need((body.match(/^##\\s+\\S/gm) || []).length >= 5, 'body needs at least 5 \"## \" sections');\n  need(/\\]\\(\\/contact\\/\\)/.test(body), 'body must link to /contact/');\n  need(/\\]\\(\\/work\\//.test(body), 'body must link to at least one project page (/work/...) from the list');\n  const nLinks = (body.match(/\\]\\(\\/[^)]*\\)/g) || []).length;\n  need(nLinks >= 3, 'body needs at least 3 internal links (it has ' + nLinks + ')');\n  for (const m of body.matchAll(/\\]\\(([^)\\s]+)\\)/g)) {\n    const href = m[1];\n    if (/^https?:/.test(href)) errors.push('external link not allowed: ' + href);\n    else if (href.startsWith('/') && !ctx.links.includes(href.split('#')[0])) errors.push('link to a page that does not exist: ' + href);\n  }\n  const all = JSON.stringify(d);\n  const banned = [\n    [/\\b(atlantic|ghalioungui|lomi|steatite|gusto)\\b/i, 'client brand name'],\n    [/\\bM[ōO]V\\b/, 'client brand name'],\n    [/[$€£]\\s?\\d|\\b\\d[\\d,.]*\\s?(usd|egp|eur|dollars?)\\b/i, 'price or currency amount'],\n    [/\\b\\d+(\\.\\d+)?\\s?%/, 'percentage statistic'],\n    [/\\b(according to|studies show|research shows|a survey|statistics show|data shows)\\b/i, 'unsourced research claim'],\n    [/\\b(guarantee[sd]?|best in the world|#1|number one)\\b/i, 'over-promise'],\n    [/\\b(as an ai|language model)\\b/i, 'AI artefact'],\n    [/(\\bAR\\s?\\/\\s?VR\\b|\\bVR\\b|augmented reality|virtual reality|3D viewer|configurator)/i, 'service the studio does not offer (AR/VR/3D viewer/configurator)'],\n  ];\n  for (const [re, why] of banned) { const h = all.match(re); if (h) errors.push(why + ': \"' + h[0] + '\" - remove it'); }\n  if (ctx.postTitles.map((x) => x.toLowerCase()).includes(String(d.title).toLowerCase())) errors.push('title duplicates an existing article');\n}\n\nconst q = (s) => \"'\" + String(s).replace(/\\s+/g, ' ').trim().replace(/'/g, \"''\") + \"'\";\nlet markdown = '';\nif (!errors.length) {\n  markdown = [\n    '---',\n    'title: ' + q(d.title),\n    'seoTitle: ' + q(d.seoTitle),\n    'description: ' + q(d.description),\n    'summary: ' + q(d.summary),\n    'pubDate: ' + ctx.today,\n    'category: ' + q(t.category),\n    'tags: [' + d.tags.map(q).join(', ') + ']',\n    'cover: ' + q(t.cover),\n    'coverAlt: ' + q(d.coverAlt),\n    'takeaways:',\n    ...d.takeaways.map((x) => '  - ' + q(x)),\n    'faqs:',\n    ...d.faqs.flatMap((f) => ['  - q: ' + q(f.q), '    a: ' + q(f.a)]),\n    'related: [' + t.related.map(q).join(', ') + ']',\n    '---',\n    '',\n    String(d.body).trim(),\n    '',\n  ].join('\\n');\n}\nreturn [{ json: { ok: errors.length === 0, errors, slug: t.slug, title: d.title || t.title, markdown, rawJson: raw.slice(0, 60000) } }];\n"
+        },
+        "name": "Validate",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3380,
+          300
+        ]
+      },
+      {
+        "id": "w3d-10",
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "valid-1",
+                "leftValue": "={{ $json.ok }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "Valid?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          3640,
+          300
+        ]
+      },
+      {
+        "id": "w3d-11",
+        "parameters": {
+          "jsCode": "\nconst ctx = $('Pick topic').first().json;\nconst v = $input.first().json;\nconst prompt = {\n  system: ctx.prompt.system,\n  messages: [\n    ctx.prompt.messages[0],\n    { role: 'assistant', content: v.rawJson || '(no valid output)' },\n    { role: 'user', content: 'The automatic checker rejected this article:\\n- ' + v.errors.join('\\n- ') + '\\n\\nFix every problem and return the complete corrected JSON object (same keys), nothing else.' },\n  ],\n};\nreturn [{ json: { prompt } }];\n"
+        },
+        "name": "Build fix request",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3900,
+          300
+        ]
+      },
+      {
+        "id": "w3d-12",
+        "parameters": {
+          "method": "POST",
+          "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googlePalmApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({\n  systemInstruction: { parts: [{ text: $('Build fix request').first().json.prompt.system }] },\n  contents: $('Build fix request').first().json.prompt.messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),\n  generationConfig: { responseMimeType: 'application/json', temperature: 0.7, maxOutputTokens: 32768 }\n}) }}",
+          "options": {
+            "timeout": 300000
+          }
+        },
+        "name": "Fix: Gemini fallback",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1300,
+          300
+        ],
+        "credentials": {
+          "googlePalmApi": {
+            "id": "NIpzrWVAKX3xX7Gs",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 10000,
+        "onError": "continueErrorOutput"
+      },
+      {
+        "id": "w3d-13",
+        "parameters": {
+          "jsCode": "\nconst r = $input.first().json || {};\nconst text = ((r.candidates && r.candidates[0] && r.candidates[0].content && r.candidates[0].content.parts) || []).map((p) => p.text || '').join('');\nreturn [{ json: { provider: 'gemini', text, error: text ? undefined : (r.error ? (r.error.message || JSON.stringify(r.error)) : 'Gemini returned no text') } }];\n"
+        },
+        "name": "Fix: Gemini result",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1560,
+          300
+        ]
+      },
+      {
+        "id": "w3d-14",
+        "parameters": {
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({\n  model: 'nvidia/nemotron-3-super-120b-a12b:free',\n  models: ['nvidia/nemotron-3-super-120b-a12b:free','google/gemma-4-31b-it:free','z-ai/glm-5.2:free'],\n  temperature: 0.7,\n  response_format: { type: 'json_object' },\n  messages: [{ role: 'system', content: $('Build fix request').first().json.prompt.system }].concat($('Build fix request').first().json.prompt.messages)\n}) }}",
+          "options": {
+            "timeout": 300000
+          }
+        },
+        "name": "Fix: OpenRouter",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1820,
+          300
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "HnlWZAZ802Ij2PtX",
+            "name": "OpenRouter API"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 10000,
+        "onError": "continueErrorOutput"
+      },
+      {
+        "id": "w3d-15",
+        "parameters": {
+          "jsCode": "\nconst r = $input.first().json || {};\nconst text = (r.choices && r.choices[0] && r.choices[0].message && r.choices[0].message.content) || '';\nconst err = r.error ? (r.error.message || JSON.stringify(r.error)) : (text ? undefined : 'OpenRouter returned no text');\nreturn [{ json: { provider: 'openrouter:' + (r.model || '?'), text, error: err } }];\n"
+        },
+        "name": "Fix: OpenRouter result",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2080,
+          300
+        ]
+      },
+      {
+        "id": "w3d-16",
+        "parameters": {
+          "jsCode": "\nconst ctx = $('Pick topic').first().json;\nconst errors = [];\nconst resp = $input.first().json;\nlet raw = String(resp.text || '').replace(/^\\s*\\x60{3}(?:json)?\\s*/i, '').replace(/\\s*\\x60{3}\\s*$/, '');\nif (resp.error && !raw) errors.push('AI provider error: ' + resp.error);\nlet d = {};\nif (!errors.length) try { d = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch (e) { errors.push('Output was not one valid JSON object: ' + e.message); }\n\nconst t = ctx.topic;\nconst need = (c, m) => { if (!c) errors.push(m); };\nconst len = (s) => String(s || '').length;\nif (!errors.length) {\n  need(len(d.title) >= 20 && len(d.title) <= 70, 'title must be 20-70 characters (is ' + len(d.title) + ')');\n  need(len(d.seoTitle) >= 10 && len(d.seoTitle) <= 40, 'seoTitle must be 15-40 characters (is ' + len(d.seoTitle) + ')');\n  need(len(d.description) >= 120 && len(d.description) <= 165, 'description must be 120-165 characters (is ' + len(d.description) + ')');\n  need(len(d.summary) >= 120 && len(d.summary) <= 420, 'summary must be 120-420 characters (is ' + len(d.summary) + ')');\n  need(Array.isArray(d.tags) && d.tags.length >= 3 && d.tags.length <= 8, 'tags must have 3-8 items');\n  need(len(d.coverAlt) >= 20, 'coverAlt too short');\n  need(Array.isArray(d.takeaways) && d.takeaways.length >= 3 && d.takeaways.length <= 6, 'takeaways must have 3-6 items');\n  need(Array.isArray(d.faqs) && d.faqs.length >= 3 && d.faqs.length <= 6, 'faqs must have 3-6 items');\n  (d.faqs || []).forEach((f, i) => need(String(f.q || '').trim().endsWith('?') && len(f.a) >= 80, 'faq ' + (i + 1) + ': question must end with \"?\" and answer be at least 80 characters'));\n  const body = String(d.body || '');\n  const wc = body.split(/\\s+/).filter(Boolean).length;\n  need(wc >= 1100 && wc <= 2800, 'body must be 1,100-2,800 words (is ' + wc + ')');\n  need(!/^#\\s/m.test(body), 'body must not contain an H1 (\"# \")');\n  need((body.match(/^##\\s+\\S/gm) || []).length >= 5, 'body needs at least 5 \"## \" sections');\n  need(/\\]\\(\\/contact\\/\\)/.test(body), 'body must link to /contact/');\n  need(/\\]\\(\\/work\\//.test(body), 'body must link to at least one project page (/work/...) from the list');\n  const nLinks = (body.match(/\\]\\(\\/[^)]*\\)/g) || []).length;\n  need(nLinks >= 3, 'body needs at least 3 internal links (it has ' + nLinks + ')');\n  for (const m of body.matchAll(/\\]\\(([^)\\s]+)\\)/g)) {\n    const href = m[1];\n    if (/^https?:/.test(href)) errors.push('external link not allowed: ' + href);\n    else if (href.startsWith('/') && !ctx.links.includes(href.split('#')[0])) errors.push('link to a page that does not exist: ' + href);\n  }\n  const all = JSON.stringify(d);\n  const banned = [\n    [/\\b(atlantic|ghalioungui|lomi|steatite|gusto)\\b/i, 'client brand name'],\n    [/\\bM[ōO]V\\b/, 'client brand name'],\n    [/[$€£]\\s?\\d|\\b\\d[\\d,.]*\\s?(usd|egp|eur|dollars?)\\b/i, 'price or currency amount'],\n    [/\\b\\d+(\\.\\d+)?\\s?%/, 'percentage statistic'],\n    [/\\b(according to|studies show|research shows|a survey|statistics show|data shows)\\b/i, 'unsourced research claim'],\n    [/\\b(guarantee[sd]?|best in the world|#1|number one)\\b/i, 'over-promise'],\n    [/\\b(as an ai|language model)\\b/i, 'AI artefact'],\n    [/(\\bAR\\s?\\/\\s?VR\\b|\\bVR\\b|augmented reality|virtual reality|3D viewer|configurator)/i, 'service the studio does not offer (AR/VR/3D viewer/configurator)'],\n  ];\n  for (const [re, why] of banned) { const h = all.match(re); if (h) errors.push(why + ': \"' + h[0] + '\" - remove it'); }\n  if (ctx.postTitles.map((x) => x.toLowerCase()).includes(String(d.title).toLowerCase())) errors.push('title duplicates an existing article');\n}\n\nconst q = (s) => \"'\" + String(s).replace(/\\s+/g, ' ').trim().replace(/'/g, \"''\") + \"'\";\nlet markdown = '';\nif (!errors.length) {\n  markdown = [\n    '---',\n    'title: ' + q(d.title),\n    'seoTitle: ' + q(d.seoTitle),\n    'description: ' + q(d.description),\n    'summary: ' + q(d.summary),\n    'pubDate: ' + ctx.today,\n    'category: ' + q(t.category),\n    'tags: [' + d.tags.map(q).join(', ') + ']',\n    'cover: ' + q(t.cover),\n    'coverAlt: ' + q(d.coverAlt),\n    'takeaways:',\n    ...d.takeaways.map((x) => '  - ' + q(x)),\n    'faqs:',\n    ...d.faqs.flatMap((f) => ['  - q: ' + q(f.q), '    a: ' + q(f.a)]),\n    'related: [' + t.related.map(q).join(', ') + ']',\n    '---',\n    '',\n    String(d.body).trim(),\n    '',\n  ].join('\\n');\n}\nreturn [{ json: { ok: errors.length === 0, errors, slug: t.slug, title: d.title || t.title, markdown, rawJson: raw.slice(0, 60000) } }];\n"
+        },
+        "name": "Validate (retry)",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          4160,
+          300
+        ]
+      },
+      {
+        "id": "w3d-17",
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "valid-2",
+                "leftValue": "={{ $json.ok }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "Valid after fix?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          4420,
+          300
+        ]
+      },
+      {
+        "id": "w3d-18",
+        "parameters": {
+          "resource": "message",
+          "operation": "sendMessage",
+          "chatId": "1896671921",
+          "text": "=❌ <b>walaa3d.studio blog — article not published</b>\nTopic: {{ ($('Pick topic').first().json.topic || {}).title || '(could not load topics)' }}\nReason: {{ ($json.errors || [($json.error && $json.error.message) || $json.message || 'unknown error']).slice(0, 6).join('; ') }}\nThe topic stays in the queue and will be tried again at the next run.",
+          "additionalFields": {
+            "parse_mode": "HTML",
+            "disable_web_page_preview": false,
+            "appendAttribution": false
+          }
+        },
+        "name": "TG: failed",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          4680,
+          300
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "b6m3KPwrhfEC7KiL",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "id": "w3d-19",
+        "parameters": {
+          "jsCode": "const v = $input.first().json;\nreturn [{ json: { slug: v.slug, title: v.title, markdown: v.markdown } }];"
+        },
+        "name": "Prepare file",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          4940,
+          300
+        ]
+      },
+      {
+        "id": "w3d-20",
+        "parameters": {
+          "operation": "toText",
+          "sourceProperty": "markdown",
+          "options": {
+            "fileName": "={{ $json.slug }}.md"
+          }
+        },
+        "name": "To file",
+        "type": "n8n-nodes-base.convertToFile",
+        "typeVersion": 1.1,
+        "position": [
+          5200,
+          300
+        ]
+      },
+      {
+        "id": "w3d-21",
+        "parameters": {
+          "operation": "write",
+          "fileName": "=/home/node/.n8n-files/walaa3d/outbox/{{ $('Prepare file').first().json.slug }}.md",
+          "options": {}
+        },
+        "name": "Save to outbox",
+        "type": "n8n-nodes-base.readWriteFile",
+        "typeVersion": 1,
+        "position": [
+          5460,
+          300
+        ]
+      },
+      {
+        "id": "w3d-22",
+        "parameters": {
+          "amount": 12,
+          "unit": "minutes"
+        },
+        "name": "Wait 12 min",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          5720,
+          300
+        ],
+        "webhookId": "walaa3d-autopost-wait"
+      },
+      {
+        "id": "w3d-23",
+        "parameters": {
+          "url": "=https://walaa3d.studio/blog/{{ $('Prepare file').first().json.slug }}/",
+          "options": {
+            "response": {
+              "response": {
+                "fullResponse": true,
+                "neverError": true
+              }
+            }
+          }
+        },
+        "name": "Check live",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          5980,
+          300
+        ]
+      },
+      {
+        "id": "w3d-24",
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "is-live",
+                "leftValue": "={{ $json.statusCode === 200 }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "Live?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          6240,
+          300
+        ]
+      },
+      {
+        "id": "w3d-25",
+        "parameters": {
+          "resource": "message",
+          "operation": "sendMessage",
+          "chatId": "1896671921",
+          "text": "=✅ <b>New article published on walaa3d.studio</b>\n\n<b>{{ $('Prepare file').first().json.title }}</b>\nhttps://walaa3d.studio/blog/{{ $('Prepare file').first().json.slug }}/\n\nKeyword: {{ ($('Pick topic').first().json.topic || {}).keyword }}\nNext: {{ $('Pick topic').first().json.nextTopic || '— queue empty, add topics' }} ({{ $('Pick topic').first().json.remaining }} left in the queue)",
+          "additionalFields": {
+            "parse_mode": "HTML",
+            "disable_web_page_preview": false,
+            "appendAttribution": false
+          }
+        },
+        "name": "TG: published",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          6500,
+          300
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "b6m3KPwrhfEC7KiL",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "id": "w3d-26",
+        "parameters": {
+          "resource": "message",
+          "operation": "sendMessage",
+          "chatId": "1896671921",
+          "text": "=⚠️ <b>walaa3d.studio blog</b>\nThe article <b>{{ $('Prepare file').first().json.title }}</b> was written but is not live after 12 minutes (the site checks may have rejected it).\nCheck: https://github.com/wramadandesign-code/walaa3d-website/actions",
+          "additionalFields": {
+            "parse_mode": "HTML",
+            "disable_web_page_preview": false,
+            "appendAttribution": false
+          }
+        },
+        "name": "TG: not live",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          6760,
+          300
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "b6m3KPwrhfEC7KiL",
+            "name": "Telegram account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Write: OpenRouter": {
+        "main": [
+          [
+            {
+              "node": "Write: OpenRouter result",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Write: Gemini fallback",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Write: Gemini result": {
+        "main": [
+          [
+            {
+              "node": "Validate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Write: Gemini fallback": {
+        "main": [
+          [
+            {
+              "node": "Write: Gemini result",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Write: Gemini result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Write: OpenRouter result": {
+        "main": [
+          [
+            {
+              "node": "Validate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fix: OpenRouter": {
+        "main": [
+          [
+            {
+              "node": "Fix: OpenRouter result",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Fix: Gemini fallback",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fix: Gemini result": {
+        "main": [
+          [
+            {
+              "node": "Validate (retry)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fix: Gemini fallback": {
+        "main": [
+          [
+            {
+              "node": "Fix: Gemini result",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Fix: Gemini result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fix: OpenRouter result": {
+        "main": [
+          [
+            {
+              "node": "Validate (retry)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mon/Wed/Fri 09:00": {
+        "main": [
+          [
+            {
+              "node": "Pick topic",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Run now (manual)": {
+        "main": [
+          [
+            {
+              "node": "Pick topic",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Pick topic": {
+        "main": [
+          [
+            {
+              "node": "Has topic?",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "TG: failed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has topic?": {
+        "main": [
+          [
+            {
+              "node": "Write: OpenRouter",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "TG: queue empty",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate": {
+        "main": [
+          [
+            {
+              "node": "Valid?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Valid?": {
+        "main": [
+          [
+            {
+              "node": "Prepare file",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Build fix request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build fix request": {
+        "main": [
+          [
+            {
+              "node": "Fix: OpenRouter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate (retry)": {
+        "main": [
+          [
+            {
+              "node": "Valid after fix?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Valid after fix?": {
+        "main": [
+          [
+            {
+              "node": "Prepare file",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "TG: failed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare file": {
+        "main": [
+          [
+            {
+              "node": "To file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "To file": {
+        "main": [
+          [
+            {
+              "node": "Save to outbox",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Save to outbox": {
+        "main": [
+          [
+            {
+              "node": "Wait 12 min",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait 12 min": {
+        "main": [
+          [
+            {
+              "node": "Check live",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check live": {
+        "main": [
+          [
+            {
+              "node": "Live?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Live?": {
+        "main": [
+          [
+            {
+              "node": "TG: published",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "TG: not live",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "Africa/Cairo",
+      "saveManualExecutions": true
+    },
+    "active": false,
+    "pinData": {}
+  }
+]

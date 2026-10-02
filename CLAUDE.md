@@ -73,6 +73,15 @@ source-media/             original WhatsApp videos + brief (git-ignored, never d
 - Writing rules: target one main keyword per post; open with a direct definition/answer; question-style H2s; internal links to services, projects and /contact/; no invented statistics, clients or prices.
 - AI assistants: `/llms.txt` + `/llms-full.txt` are generated from site data (`src/lib/llms.ts`) — update data, not the files. `robots.txt` explicitly allows AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended…). Business/Person JSON-LD (address, contactPoint, services catalog, sameAs) lives in BaseLayout; About page has a "Quick facts" block — keep it factual.
 
+## Automated blog (3 posts/week, no manual approval)
+
+- **n8n workflow** `WALAA3D-01: blog autopost (Mon/Wed/Fri)` (id `Walaa3dBlogAuto1`) on the Oracle server (`ubuntu@80.225.65.148 -p 2222`, n8n in Docker at n8n.alsakronline.com). Runs Mon/Wed/Fri 09:00 Africa/Cairo. Source of truth: `automation/n8n/build-workflow.mjs` → `node automation/n8n/build-workflow.mjs` → copy JSON to the server → `docker exec n8n n8n import:workflow --input=/home/node/.n8n-files/walaa3d/workflow.json`.
+- Flow: pick first topic in `content/backlog.json` not yet in `src/content/blog/` → Claude (`CLAUDE_HEADER_AUTH`, model `claude-sonnet-5`) writes JSON → workflow validates (same rules as `scripts/validate-post.mjs`), asks Claude to fix once if needed → assembles frontmatter itself → writes `/home/node/.n8n-files/walaa3d/outbox/<slug>.md` → waits 12 min → checks the live URL → Telegram (chat 1896671921) ✅ published / ⚠️ not live / ❌ failed / queue empty.
+- **Publisher** `/home/ubuntu/walaa3d-autopost/publish.sh` (cron every 2 min, log `publish.log`) pushes outbox files to branch `autopost/<slug>` with a repo **deploy key** (`~/walaa3d-autopost/deploy_key`, never leaves the server; GitHub key title "Oracle n8n autopost (walaa3d)").
+- **GitHub gate** `.github/workflows/autopost.yml`: branch may only touch `src/content/blog/*.md` → `validate-post.mjs` → full build → rebase/merge into main → delete branch → `gh workflow run deploy.yml`. Failures leave the branch for inspection and nothing goes live. `deploy.yml` also validates all posts on every deploy.
+- To add topics: append to `content/backlog.json` (unique slug + keyword; allowed covers/related listed in its `_readme`). Telegram warns when the queue is empty; it reports how many topics remain after each post.
+- Manual extra post: run the workflow's "Run now (manual)" trigger in n8n, or on the server `docker exec -e N8N_RUNNERS_BROKER_PORT=5689 -e N8N_PORT=5699 n8n n8n execute --id=Walaa3dBlogAuto1`.
+
 ## Design system
 
 - Colours (Tailwind names): `canvas` #ECECEA page bg · `surface` #F6F6F4 cards · `mist` alt sections · `line` borders · `ink` #151515 text · `ink-soft` secondary text · `ink-faint` meta (large text only) · `night` video frames · `gold` #DCC28A buttons · `gold-light` hover · `gold-pale` tints · `gold-deep` #8C6D33 for gold **text** on light backgrounds (AA contrast). Never put `gold` text on `canvas`.

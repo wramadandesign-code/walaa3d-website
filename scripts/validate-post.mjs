@@ -28,6 +28,7 @@ const BANNED = [
   [/\b(according to|studies show|research shows|a survey|statistics show|data shows)\b/i, 'unsourced research claim'],
   [/\b(guarantee[sd]?|best in the world|#1|number one)\b/i, 'over-promise'],
   [/\b(as an ai|language model|i cannot)\b/i, 'AI artefact'],
+  [/(\bAR\s?\/\s?VR\b|\bVR\b|augmented reality|virtual reality|3D viewer|configurator)/i, 'service the studio does not offer (AR/VR/3D viewer/configurator)'],
 ];
 
 const words = (s) => s.split(/\s+/).filter(Boolean).length;
@@ -66,7 +67,8 @@ function check(file) {
   const h2 = (body.match(/^##\s+\S/gm) || []).length;
   need(h2 >= 5, `body needs at least 5 H2 sections (has ${h2})`);
   need(/\]\(\/contact\/\)/.test(body), 'body must link to /contact/');
-  need(/\]\(\/(services|work)\//.test(body), 'body must link to at least one service or project page');
+  need(/\]\(\/work\//.test(body), 'body must link to at least one project page (/work/...)');
+  need((body.match(/\]\(\/[^)]*\)/g) || []).length >= 3, 'body needs at least 3 internal links');
 
   for (const [, href] of body.matchAll(/\]\(([^)\s]+)\)/g)) {
     if (/^https?:\/\//.test(href)) errors.push(`external link not allowed: ${href}`);

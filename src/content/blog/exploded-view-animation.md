@@ -20,7 +20,7 @@ faqs:
   - q: 'How long does it take to produce a typical exploded view animation?'
     a: 'A 15‑ to 30‑second exploded view usually fits within the standard 1‑ to 3‑week timeline for a 3D product animation. The exact time depends on the model’s readiness, the number of components, and any special effects like material highlights or UI screens. Providing clean CAD files and a clear shot list helps keep the schedule on track.'
   - q: 'Can I reuse the same 3D model for other marketing assets?'
-    a: 'Yes. Once the model is built, textured, and lit, it can generate still renders for e‑commerce, 360° views, social‑media cuts, and even AR/VR previews. Changing colours, materials, or adding a new version is an edit to the existing scene rather than a full reshoot, saving time and cost.'
+    a: 'Yes. Once the model is built, textured, and lit, it can generate still renders for e‑commerce, 360° views and social‑media cuts. Changing colours, materials, or adding a new version is an edit to the existing scene rather than a full reshoot, saving time and cost.'
   - q: 'What is the most common mistake when planning an exploded view?'
     a: 'The most frequent error is choosing a separation sequence that does not follow a logical assembly or disassembly order, which confuses viewers. Another mistake is spreading parts too far apart or adding random spins that make the explosion look chaotic rather than informative. Planning the motion as a clear, step‑by‑step reveal avoids these issues.'
 related: ['smart-sensor-exploded-view-animation', 'autonomous-cleaning-robot-animation', 'surgical-operating-table-mechanism-animation']
@@ -32,7 +32,7 @@ This article explains what an exploded view is, which products benefit most, how
 
 ## What is an exploded view animation?
 
-An exploded view animation takes a 3D model of a product and moves its components away from each other along predefined axes. The motion is usually smooth and symmetrical, showing each part in relation to the others before they come back together. Unlike a simple rotation, the explosion highlights what is inside the shell, how parts fit, and what fasteners or connectors are used.
+An exploded view animation takes a 3D model of a product and moves its components away from each other along predefined axes. The motion is usually smooth and symmetrical, showing each part in relation to the others before they come back together. Unlike a simple rotation, the explosion highlights what is inside the shell, how parts fit, and what fasteners or connectors are used. You can see the technique in the [smart sensor exploded view](/work/smart-sensor-exploded-view-animation/) project, which opens a compact device layer by layer.
 
 The technique originates from technical illustrations used in manuals, but in 3D it adds timing, lighting, and camera movement that make the sequence engaging. A well‑done explosion can be completed in a few seconds yet leave a lasting impression of engineering quality.
 
@@ -44,7 +44,7 @@ Products with hidden technology or layered construction are natural candidates. 
 - Medical instruments that contain disposable cartridges, sensors, or fluid paths.
 - Consumer appliances where the motor, heating element, or control board adds value to the story.
 
-If the product’s main selling point is its outward appearance only, an exploded view may add little value. In those cases a product reveal or lifestyle render might be more effective.
+If the product’s main selling point is its outward appearance only, an exploded view may add little value. In those cases a product reveal or lifestyle render might be more effective. For a broader overview of formats, read [what 3D product animation is](/blog/what-is-3d-product-animation/).
 
 ## How to plan the explosion sequence
 
@@ -85,10 +85,10 @@ Avoiding these pitfalls keeps the animation focused on communicating build quali
 ## Integrating exploded views into a wider campaign
 
 An exploded view animation rarely stands alone. It works best when paired with:
-- **Hero product reveal** – Use the explosion as a middle section of a launch film that starts with a close‑up of the exterior and ends with the product in use.
+- **Hero product reveal** – Use the explosion as a middle section of a launch film that starts with a close‑up of the exterior and ends with the product in use — like the X-ray pass in the [autonomous cleaning robot](/work/autonomous-cleaning-robot-animation/) film.
 - **Feature cuts** – Isolate a single component (e.g., the flexible circuit) and create a short 9:16 clip for social media that highlights its material or function.
 - **Still renders** – Export high‑resolution images of the exploded state for use in datasheets, white papers, or trade‑show boards.
-- **Interactive 3D** – The same model can be uploaded to a viewer that lets customers explore the explosion themselves on a product page.
+- **Product-page clips** – Short loops of the explosion work well next to the feature they explain on your product page.
 
 By reusing the model and animation assets you maximize return on investment while keeping visual language consistent across channels.
 
