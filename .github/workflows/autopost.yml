@@ -1,0 +1,68 @@
+name: Autopost (automated blog)
+
+# The n8n workflow on the Oracle server pushes each new article to a branch
+# "autopost/<slug>". This workflow is the gate: it only lets the post go live if
+#   1. the branch adds/changes nothing but files in src/content/blog/,
+#   2. the post passes scripts/validate-post.mjs (quality rules), and
+#   3. the whole site still builds.
+# Then it merges into main, deletes the branch and starts the normal deploy.
+# If anything fails, nothing is published and the branch stays for inspection.
+
+on:
+  push:
+    branches: ['autopost/**']
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: autopost
+  cancel-in-progress: false
+
+jobs:
+  gate-and-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Only blog files may change
+        id: files
+        run: |
+          git fetch origin main
+          CHANGED=$(git diff --name-only origin/main...HEAD)
+          echo "Changed files:"; echo "$CHANGED"
+          if [ -z "$CHANGED" ]; then echo "::error::No changes"; exit 1; fi
+          if echo "$CHANGED" | grep -vqE '^src/content/blog/[a-z0-9-]+\.md$'; then
+            echo "::error::Autopost branches may only add blog posts in src/content/blog/"; exit 1
+          fi
+          echo "posts=$(echo $CHANGED | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+
+      - run: npm ci
+
+      - name: Quality gate
+        run: node scripts/validate-post.mjs ${{ steps.files.outputs.posts }}
+
+      - name: Build check
+        run: npm run build
+        env:
+          PUBLIC_SITE_URL: https://walaa3d.studio
+
+      - name: Merge into main
+        run: |
+          git config user.name "walaa3d-autopost"
+          git config user.email "contact@walaa3d.studio"
+          git rebase origin/main
+          git push origin HEAD:main
+          git push origin --delete "${GITHUB_REF_NAME}"
+
+      - name: Deploy the site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main --repo "${GITHUB_REPOSITORY}"

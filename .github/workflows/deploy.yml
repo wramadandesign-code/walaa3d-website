@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # autopost.yml starts this via workflow_dispatch after merging an automated post
+  # (pushes made with GITHUB_TOKEN do not trigger the push event above).
 
 permissions:
   contents: read
@@ -24,6 +26,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Quality gate for all blog posts
+        run: node scripts/validate-post.mjs --all
       - run: npm run build
         env:
           # Public URL of the site (custom domain, DNS on Cloudflare)
