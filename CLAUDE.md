@@ -46,6 +46,8 @@ npm run offline               # build + share/offline/ copy that opens from disk
 - **Repo:** https://github.com/wramadandesign-code/walaa3d-website — every push to `main` builds and deploys via `.github/workflows/deploy.yml` (Pages source = GitHub Actions, custom domain walaa3d.studio, `public/CNAME`).
 - DNS (Cloudflare): apex A → 185.199.108–111.153, `www` CNAME → wramadandesign-code.github.io. Keep records **DNS only** (grey cloud) so GitHub can issue/renew the HTTPS certificate.
 - *.netlify.app is blocked on Walaa's ISP — don't use Netlify.
+- **Email:** contact@walaa3d.studio — *receiving* via Cloudflare Email Routing (rule → wramadan.design@gmail.com; MX route1-3.mx.cloudflare.net + DKIM `cf2024-1._domainkey`); *sending* via Gmail "Send mail as" through smtp.gmail.com:587 (app password). SPF: `v=spf1 include:_spf.mx.cloudflare.net include:_spf.google.com ~all`; DMARC `_dmarc` is `p=none` (keep it — Gmail-relayed mail isn't DKIM-aligned for walaa3d.studio, so a stricter policy would reject it).
+- **Phone/WhatsApp:** +20 155 233 0060 (`site.contact.phone` / `whatsapp` in `src/config/site.ts`); floating WhatsApp button = `src/components/WhatsAppFab.astro`.
 - Base-path support is kept for sub-path hosts: keep writing root-relative links in source (`/work/`, `/media/…`) — `scripts/base-path-links.mjs` prefixes them only when `base` ≠ `/`. For absolute URLs (canonical, OG, JSON-LD) use `abs()` / `originOf()` from `src/config/urls.ts`, never `Astro.site` directly.
 
 ## Structure
