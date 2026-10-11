@@ -1,0 +1,219 @@
+---
+/**
+ * 3D ring carousel of product-visualization stills.
+ * - Cards sit on a cylinder (CSS 3D); the ring auto-rotates, pauses on hover/focus,
+ *   can be dragged/swiped with inertia, and steps with ← / → keys.
+ * - Click a card → lightbox with prev/next.
+ * - No JS or prefers-reduced-motion → plain horizontal scroll-snap row (still usable).
+ */
+import Icon from './Icon.astro';
+import { gallery } from '@/data/gallery';
+
+interface Props { eyebrow?: string; title?: string; intro?: string; id?: string }
+const {
+  eyebrow = 'Product visualization',
+  title = 'Renders from the studio',
+  intro = 'Photoreal stills from recent projects — materials, light and detail, built from the same 3D models as the animations.',
+  id = 'renders',
+} = Astro.props;
+const n = gallery.length;
+---
+
+<section id={id} class="gallery3d overflow-hidden py-24 sm:py-32" aria-labelledby={`${id}-title`}>
+  <div class="container-x flex flex-wrap items-end justify-between gap-6">
+    <div class="max-w-3xl" data-reveal>
+      <p class="eyebrow">{eyebrow}</p>
+      <h2 id={`${id}-title`} class="mt-5 font-display text-4xl font-medium leading-[1.05] sm:text-5xl lg:text-6xl">{title}</h2>
+      <p class="prose-body mt-6 max-w-2xl">{intro}</p>
+    </div>
+    <p class="ring-hint flex items-center gap-2 text-sm text-ink-soft" data-reveal aria-hidden="true">
+      <span class="grid size-9 place-items-center rounded-full border border-line">↔</span> Drag to explore · click to enlarge
+    </p>
+  </div>
+
+  <div
+    class="ring-stage mt-10"
+    data-ring
+    tabindex="0"
+    role="region"
+    aria-roledescription="carousel"
+    aria-label={`${title} — ${n} renders. Use left and right arrow keys to rotate.`}
+    data-cursor="Drag"
+    style={`--n:${n}`}
+  >
+    <div class="ring-floor" aria-hidden="true"></div>
+    <ul class="ring" data-ring-track>
+      {gallery.map((s, i) => (
+        <li class="ring-card" style={`--i:${i}`}>
+          <button type="button" data-ring-open={i} data-cursor="View" aria-label={`Enlarge: ${s.alt}`}>
+            <img src={`/media/gallery/${s.slug}-card.webp`} alt={s.alt} width="420" height="560" loading="lazy" decoding="async" draggable="false" />
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <dialog class="ring-lightbox" data-ring-lightbox aria-label="Render viewer">
+    <figure>
+      <img data-lb-img alt="" />
+      <figcaption class="mt-4 flex flex-wrap items-center justify-between gap-4 text-sm text-canvas/80">
+        <span data-lb-caption></span>
+        <a data-lb-link href="#" class="link-underline text-gold">View project</a>
+      </figcaption>
+    </figure>
+    <button type="button" class="lb-btn left-4" data-lb-prev aria-label="Previous render">←</button>
+    <button type="button" class="lb-btn right-4" data-lb-next aria-label="Next render">→</button>
+    <button type="button" class="lb-close" data-lb-close aria-label="Close"><Icon name="close" class="size-5" /></button>
+  </dialog>
+</section>
+
+<script define:vars={{ items: gallery.map((s) => ({ src: `/media/gallery/${s.slug}.webp`, alt: s.alt, project: s.project ? `/work/${s.project}/` : '' })) }}>
+  (() => {
+    const stage = document.querySelector('[data-ring]');
+    if (!stage) return;
+    const track = stage.querySelector('[data-ring-track]');
+    const cards = [...stage.querySelectorAll('.ring-card')];
+    const n = cards.length;
+    const step = 360 / n;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Native lazy-loading can't judge 3D-transformed cards, so load them all when the
+    // carousel approaches the viewport (they are small, ~25 KB each).
+    new IntersectionObserver((entries, io) => {
+      if (!entries[0].isIntersecting) return;
+      stage.querySelectorAll('img[loading="lazy"]').forEach((im) => { im.loading = 'eager'; });
+      io.disconnect();
+    }, { rootMargin: '600px 0px' }).observe(stage);
+
+    // ---------- lightbox (works in both 3D and flat modes)
+    const dlg = document.querySelector('[data-ring-lightbox]');
+    const img = dlg.querySelector('[data-lb-img]');
+    const cap = dlg.querySelector('[data-lb-caption]');
+    const link = dlg.querySelector('[data-lb-link]');
+    let current = 0;
+    const show = (i) => {
+      current = (i + n) % n;
+      const it = items[current];
+      img.src = it.src; img.alt = it.alt; cap.textContent = it.alt;
+      link.hidden = !it.project; if (it.project) link.href = it.project;
+    };
+    const open = (i) => { show(i); if (!dlg.open) dlg.showModal(); };
+    dlg.querySelector('[data-lb-prev]').addEventListener('click', () => show(current - 1));
+    dlg.querySelector('[data-lb-next]').addEventListener('click', () => show(current + 1));
+    dlg.querySelector('[data-lb-close]').addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') show(current - 1); if (e.key === 'ArrowRight') show(current + 1); });
+
+    if (reduce) {
+      stage.classList.add('is-flat');
+      stage.addEventListener('click', (e) => { const b = e.target.closest('[data-ring-open]'); if (b) open(+b.dataset.ringOpen); });
+      return;
+    }
+    stage.classList.add('is-3d');
+
+    // ---------- 3D ring
+    let radius = 0;
+    const layout = () => {
+      const w = track.offsetWidth || 220; // untransformed card width (--cw)
+      radius = Math.round((w + 14) / (2 * Math.tan(Math.PI / n)));
+      stage.style.setProperty('--r', radius + 'px');
+    };
+    layout();
+    addEventListener('resize', layout);
+
+    let angle = 0, velocity = 0, target = null, hovering = false, dragging = false, visible = true;
+    const AUTO = -0.06; // deg per frame
+    const render = () => {
+      track.style.transform = `translateZ(${-radius}px) rotateX(-7deg) rotateY(${angle}deg)`;
+      for (let i = 0; i < n; i++) {
+        const rel = ((angle + i * step) % 360 + 540) % 360 - 180; // -180..180, 0 = front
+        const facing = Math.cos((rel * Math.PI) / 180);
+        cards[i].style.opacity = facing > 0 ? String(0.25 + 0.75 * facing) : '0';
+        cards[i].style.visibility = facing > 0 ? 'visible' : 'hidden';
+        cards[i].style.pointerEvents = facing > 0.55 ? 'auto' : 'none';
+      }
+    };
+    const loop = () => {
+      if (visible) {
+        if (target !== null) {
+          angle += (target - angle) * 0.12;
+          if (Math.abs(target - angle) < 0.05) { angle = target; target = null; }
+        } else if (!dragging) {
+          angle += velocity;
+          velocity *= 0.94;
+          if (Math.abs(velocity) < 0.02 && !hovering) angle += AUTO;
+        }
+        render();
+      }
+      requestAnimationFrame(loop);
+    };
+    render();
+    requestAnimationFrame(loop);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(stage);
+
+    stage.addEventListener('pointerenter', () => { hovering = true; });
+    stage.addEventListener('pointerleave', () => { hovering = false; });
+    stage.addEventListener('focusin', () => { hovering = true; });
+    stage.addEventListener('focusout', () => { hovering = false; });
+
+    // drag / swipe with inertia; a click (tiny movement) opens the card
+    let startX = 0, lastX = 0, moved = 0, downCard = null;
+    stage.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      dragging = true; target = null; startX = lastX = e.clientX; moved = 0; velocity = 0;
+      downCard = e.target.closest('[data-ring-open]');
+      stage.setPointerCapture(e.pointerId);
+      stage.classList.add('is-dragging');
+    });
+    stage.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastX; lastX = e.clientX; moved = Math.max(moved, Math.abs(e.clientX - startX));
+      angle += dx * 0.18; velocity = dx * 0.18;
+    });
+    const end = () => {
+      if (!dragging) return;
+      dragging = false; stage.classList.remove('is-dragging');
+      if (moved < 6 && downCard) { velocity = 0; open(+downCard.dataset.ringOpen); }
+      downCard = null;
+    };
+    stage.addEventListener('pointerup', end);
+    stage.addEventListener('pointercancel', end);
+    // keyboard: activating a focused card button opens it (pointer handler covers mouse)
+    stage.addEventListener('click', (e) => { if (e.detail === 0) { const b = e.target.closest('[data-ring-open]'); if (b) open(+b.dataset.ringOpen); } });
+    stage.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const base = Math.round((target ?? angle) / step) * step;
+      target = base + (e.key === 'ArrowLeft' ? step : -step);
+    });
+  })();
+</script>
+
+<style>
+  .ring-stage { position: relative; height: clamp(360px, 46vw, 600px); perspective: 1500px; perspective-origin: 50% 30%; outline: none; }
+  .ring-stage:focus-visible { box-shadow: inset 0 0 0 2px var(--color-gold-deep); border-radius: 1.5rem; }
+  .ring { position: absolute; left: 50%; top: 50%; width: var(--cw); height: calc(var(--cw) * 4 / 3); margin: calc(var(--cw) * -2 / 3) 0 0 calc(var(--cw) / -2); transform-style: preserve-3d; --cw: clamp(150px, 17vw, 240px); }
+  .ring-card { position: absolute; inset: 0; backface-visibility: hidden; transform: rotateY(calc(var(--i) * 360deg / var(--n))) translateZ(var(--r, 900px)); transition: opacity 0.2s linear; }
+  .ring-card button, .ring-card img { backface-visibility: hidden; }
+  .ring-card button { display: block; width: 100%; height: 100%; padding: 0; overflow: hidden; border-radius: 1.25rem; background: var(--color-night); box-shadow: 0 30px 60px -30px rgb(21 21 21 / 0.55); outline-offset: 4px; }
+  .ring-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease-out-expo); user-select: none; -webkit-user-drag: none; }
+  .ring-card button:hover img, .ring-card button:focus-visible img { transform: scale(1.06); }
+  .ring-floor { position: absolute; left: 50%; bottom: 4%; width: min(80vw, 900px); height: 90px; transform: translateX(-50%); background: radial-gradient(closest-side, rgb(220 194 138 / 0.45), transparent); filter: blur(10px); pointer-events: none; }
+  .is-3d { cursor: grab; touch-action: pan-y; user-select: none; }
+  .is-dragging { cursor: grabbing; }
+
+  /* Flat fallback: no JS (html.no-js) or reduced motion */
+  :global(html.no-js) .ring-stage, .ring-stage.is-flat { height: auto; perspective: none; }
+  :global(html.no-js) .ring, .is-flat .ring { position: static; display: flex; gap: 1rem; width: auto; height: auto; margin: 0; padding: 0 1.25rem 1rem; overflow-x: auto; scroll-snap-type: x mandatory; transform: none !important; }
+  :global(html.no-js) .ring-card, .is-flat .ring-card { position: relative; flex: 0 0 220px; aspect-ratio: 3 / 4; transform: none; opacity: 1 !important; pointer-events: auto !important; scroll-snap-align: center; }
+  :global(html.no-js) .ring-floor, .is-flat .ring-floor, :global(html.no-js) .ring-hint { display: none; }
+
+  /* Lightbox */
+  .ring-lightbox { position: fixed; inset: 0; margin: auto; width: fit-content; height: fit-content; max-width: min(92vw, 1100px); max-height: 92vh; padding: 0; border: 0; background: transparent; overflow: visible; }
+  .ring-lightbox::backdrop { background: rgb(18 18 18 / 0.88); backdrop-filter: blur(6px); }
+  .ring-lightbox img { display: block; max-width: 100%; max-height: 80vh; margin: 0 auto; border-radius: 1rem; object-fit: contain; }
+  .lb-btn, .lb-close { position: fixed; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 9999px; background: rgb(246 246 244 / 0.12); color: #fff; font-size: 1.25rem; transition: background 0.3s; }
+  .lb-btn { top: 50%; transform: translateY(-50%); }
+  .lb-btn:hover, .lb-close:hover { background: var(--color-gold); color: var(--color-ink); }
+  .lb-close { top: 1rem; right: 1rem; }
+</style>

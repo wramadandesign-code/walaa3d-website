@@ -6,6 +6,7 @@ import ProjectCard from '@/components/ProjectCard.astro';
 import SectionHeader from '@/components/SectionHeader.astro';
 import CtaBand from '@/components/CtaBand.astro';
 import Faq from '@/components/Faq.astro';
+import Gallery3D from '@/components/Gallery3D.astro';
 import Icon from '@/components/Icon.astro';
 import PostCard from '@/components/PostCard.astro';
 import { getPosts } from '@/lib/blog';
@@ -128,6 +129,9 @@ const schema = [
       <ProjectCard project={p6} class="md:col-span-12 lg:col-span-7 lg:col-start-6 lg:mt-32" frameClass="aspect-[16/10]" />
     </div>
   </section>
+
+  <!-- 3D RENDER CAROUSEL -->
+  <Gallery3D />
 
   <!-- SERVICES -->
   <section id="services" class="mt-20 bg-mist/60 py-24 sm:py-32" aria-labelledby="services-title">
