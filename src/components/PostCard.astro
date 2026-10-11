@@ -8,7 +8,7 @@ const { title, summary, cover, coverAlt, category, pubDate } = post.data;
 ---
 
 <article class:list={['group', featured && 'md:col-span-2']} data-reveal>
-  <a href={`/blog/${post.id}/`} class:list={['grid gap-6', featured && 'md:grid-cols-2 md:items-center md:gap-10']}>
+  <a href={`/blog/${post.id}/`} data-cursor="Read" class:list={['grid gap-6', featured && 'md:grid-cols-2 md:items-center md:gap-10']}>
     <div class="aspect-[16/10] overflow-hidden rounded-2xl bg-night">
       <picture>
         <source srcset={`/media/posters/${cover}.webp`} type="image/webp" />

@@ -8,7 +8,7 @@ import Icon from '@/components/Icon.astro';
 import { projects } from '@/data/projects';
 
 // Layout order: portrait cards fill single columns, landscape cards span two.
-const order = ['01', '02', '03', '05', '04', '06'].map((n) => projects.find((p) => p.number === n)!);
+const order = ['01', '07', '02', '03', '05', '04', '06'].map((n) => projects.find((p) => p.number === n)!);
 
 const origin = originOf(Astro.site!);
 const schema = [

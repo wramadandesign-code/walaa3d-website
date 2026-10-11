@@ -88,6 +88,7 @@ source-media/             original WhatsApp videos + brief (git-ignored, never d
 - Colours (Tailwind names): `canvas` #ECECEA page bg · `surface` #F6F6F4 cards · `mist` alt sections · `line` borders · `ink` #151515 text · `ink-soft` secondary text · `ink-faint` meta (large text only) · `night` video frames · `gold` #DCC28A buttons · `gold-light` hover · `gold-pale` tints · `gold-deep` #8C6D33 for gold **text** on light backgrounds (AA contrast). Never put `gold` text on `canvas`.
 - Buttons: `btn btn-gold` (primary), `btn btn-ghost` (secondary). Always include both classes.
 - Section rhythm: `container-x` wrapper, `py-24 sm:py-32`, eyebrow (`.eyebrow`) → Jost heading → `.prose-body`.
+- Mouse effects (desktop mouse only, off with reduced motion): custom gold ring cursor + dot, gold trail canvas, magnetic `.btn`s (`data-magnetic="0"` disables), hover labels via `data-cursor="View"` (ProjectCard) / `"Read"` (PostCard). Code: end of `src/scripts/site.ts`; markup in BaseLayout; CSS end of global.css.
 - Motion: add `data-reveal` (optional `style="--reveal-delay:120ms"`) for scroll reveal. The first section of each page animates with pure CSS so above-the-fold content never waits for JS. Respect `prefers-reduced-motion` (already global).
 - Rounded, soft cards (`rounded-[1.5rem]`, `ring-1 ring-line`); the primary service card is the one dark (`bg-ink`) element.
 
@@ -99,7 +100,7 @@ For every video `name` the site expects:
 - Generate all of them with `scripts/process-video.mjs`. ffmpeg is installed via winget (Gyan.FFmpeg); if not on PATH, set `FFMPEG` to `%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg_*\ffmpeg-*\bin\ffmpeg.exe`.
 - Loop videos use `preload="none"` + poster and only play while on screen — keep it that way for performance.
 - **To swap in HQ renders:** run the script with the same `name` to overwrite, then update `width/height/duration` in `projects.ts`. Pick a poster time without a dominant client logo.
-- Current media names → project: `cleaning-robot` (21:9) + `cleaning-robot-vertical` → Autonomous Cleaning Robot · `service-robot` → Hospitality Service Robot · `handheld-device` → Smart Pressure Sensor · `reception-robot` → Retail Assistant Robot · `operating-table` → Surgical Operating Table · `water-heater` → Electric Water Heater.
+- Current media names → project: `cleaning-robot` (21:9) + `cleaning-robot-vertical` → Autonomous Cleaning Robot · `service-robot` → Hospitality Service Robot · `handheld-device` → Smart Pressure Sensor · `reception-robot` → Retail Assistant Robot · `operating-table` → Surgical Operating Table · `water-heater` → Electric Water Heater · `hotel-delivery-robot` → Hotel Room-Delivery Robot (720×1280 source).
 
 ## Adding a project
 

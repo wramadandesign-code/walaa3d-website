@@ -144,3 +144,24 @@ details[open] .faq-icon { transform: rotate(45deg); }
 .article td { @apply border-b border-line px-4 py-3 align-top; }
 .article hr { @apply my-12 border-line; }
 .article code { @apply rounded bg-surface px-1.5 py-0.5 text-[0.9em] text-ink ring-1 ring-line; }
+
+/* Custom cursor + gold trail (desktop with a mouse only; see scripts/site.ts) */
+html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor label, html.has-cursor [data-cursor] { cursor: none; }
+html.has-cursor :is(input, textarea, select, video) { cursor: auto; }
+.cursor, .cursor-dot { position: fixed; top: 0; left: 0; z-index: 1500; pointer-events: none; display: none; }
+html.has-cursor .cursor, html.has-cursor .cursor-dot { display: block; }
+.cursor-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 9999px; background: var(--color-gold-deep); }
+.cursor {
+  display: none; place-items: center;
+  width: 42px; height: 42px; margin: -21px 0 0 -21px; border-radius: 9999px;
+  border: 1px solid var(--color-gold-deep);
+  transition: width 0.45s var(--ease-out-expo), height 0.45s var(--ease-out-expo), margin 0.45s var(--ease-out-expo), background-color 0.3s, border-color 0.3s;
+}
+html.has-cursor .cursor { display: grid; }
+.cursor__label { font: 500 0.66rem/1 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink); opacity: 0; transition: opacity 0.25s; }
+.cursor.is-hover { width: 70px; height: 70px; margin: -35px 0 0 -35px; background: rgb(220 194 138 / 0.22); border-color: var(--color-gold); }
+.cursor.is-label { width: 96px; height: 96px; margin: -48px 0 0 -48px; background: var(--color-gold); border-color: var(--color-gold); }
+.cursor.is-label .cursor__label { opacity: 1; }
+.cursor.is-hidden, .cursor-dot.is-hidden { opacity: 0; }
+.fluid { position: fixed; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: multiply; display: none; }
+html.has-cursor .fluid { display: block; }

@@ -64,3 +64,101 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
   );
   loops.forEach((v) => vio.observe(v));
 }
+
+// ---------------------------------------------------------------------------
+// Mouse effects — custom cursor, hover labels, magnetic buttons, gold trail.
+// Only for a real mouse (fine pointer + hover) and when motion is allowed.
+// Labels: add data-cursor="View" to any link/element. Buttons (.btn) are magnetic
+// by default; tune with data-magnetic="0.2" or disable with data-magnetic="0".
+// ---------------------------------------------------------------------------
+const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+if (finePointer && !reduceMotion) {
+  const root = document.documentElement;
+  const ring = document.querySelector<HTMLElement>('.cursor');
+  const dot = document.querySelector<HTMLElement>('.cursor-dot');
+  const label = ring?.querySelector<HTMLElement>('.cursor__label');
+  const mouse = { x: innerWidth / 2, y: innerHeight / 2 };
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  if (ring && dot && label) {
+    root.classList.add('has-cursor');
+    const pos = { ...mouse };
+    let seen = false;
+    addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      if (!seen) { seen = true; pos.x = mouse.x; pos.y = mouse.y; }
+    }, { passive: true });
+    document.addEventListener('mouseleave', () => { ring.classList.add('is-hidden'); dot.classList.add('is-hidden'); });
+    document.addEventListener('mouseenter', () => { ring.classList.remove('is-hidden'); dot.classList.remove('is-hidden'); });
+    const tick = () => {
+      pos.x = lerp(pos.x, mouse.x, 0.16);
+      pos.y = lerp(pos.y, mouse.y, 0.16);
+      ring.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
+      dot.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0)`;
+      requestAnimationFrame(tick);
+    };
+    tick();
+    document.addEventListener('pointerover', (e) => {
+      const el = (e.target as Element | null)?.closest?.('[data-cursor], a, button, label, select, summary') as HTMLElement | null;
+      const text = el?.dataset.cursor;
+      ring.classList.toggle('is-hover', !!el);
+      ring.classList.toggle('is-label', !!text);
+      if (text) label.textContent = text;
+    });
+  }
+
+  // Magnetic buttons
+  document.querySelectorAll<HTMLElement>('.btn, [data-magnetic]').forEach((el) => {
+    const strength = parseFloat(el.dataset.magnetic ?? '0.2');
+    if (!strength) return;
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * strength}px, ${(e.clientY - r.top - r.height / 2) * strength}px)`;
+    });
+    el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+  });
+
+  // Soft gold trail (canvas, multiply blend so it tints the light page)
+  const canvas = document.querySelector<HTMLCanvasElement>('.fluid');
+  const ctx = canvas?.getContext('2d');
+  if (canvas && ctx) {
+    const dpr = Math.min(devicePixelRatio, 1.5);
+    const resize = () => { canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; };
+    resize();
+    addEventListener('resize', resize);
+    type P = { x: number; y: number; r: number; life: number; vx: number; vy: number; warm: boolean };
+    const parts: P[] = [];
+    let last = { ...mouse };
+    const draw = () => {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0,0,0,0.08)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'source-over';
+      const dx = mouse.x - last.x, dy = mouse.y - last.y, dist = Math.hypot(dx, dy);
+      const n = Math.min(12, Math.floor(dist / 6));
+      for (let i = 0; i < n; i++) {
+        const t = i / n;
+        parts.push({ x: last.x + dx * t, y: last.y + dy * t, r: 18 + Math.min(dist, 80) * 0.5, life: 1, vx: dx * 0.02 + (Math.random() - 0.5), vy: dy * 0.02 + (Math.random() - 0.5), warm: Math.random() > 0.5 });
+      }
+      last = { ...mouse };
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i];
+        p.life -= 0.022; p.x += p.vx; p.y += p.vy; p.vx *= 0.96; p.vy *= 0.96; p.r *= 1.012;
+        if (p.life <= 0) { parts.splice(i, 1); continue; }
+        const g = ctx.createRadialGradient(p.x * dpr, p.y * dpr, 0, p.x * dpr, p.y * dpr, p.r * dpr);
+        const rgb = p.warm ? '220,194,138' : '140,109,51'; // gold · gold-deep
+        g.addColorStop(0, `rgba(${rgb},${0.09 * p.life})`);
+        g.addColorStop(1, `rgba(${rgb},0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(p.x * dpr, p.y * dpr, p.r * dpr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      if (parts.length > 400) parts.splice(0, parts.length - 400);
+      requestAnimationFrame(draw);
+    };
+    draw();
+  }
+}

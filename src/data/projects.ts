@@ -169,6 +169,28 @@ export const projects: Project[] = [
     formats: ['16:9 landscape'],
     media: [{ name: 'water-heater', aspect: 'landscape', width: 1920, height: 1080, duration: 'PT40S' }],
   },
+  {
+    slug: 'hotel-delivery-robot-product-reveal',
+    number: '07',
+    title: 'Hotel Room-Delivery Robot',
+    type: 'Cinematic Product Reveal',
+    industry: 'Robotics · Hotels & Hospitality',
+    service: 'animation',
+    summary:
+      'A cinematic reveal for an autonomous hotel delivery robot — fog and light-beam reveal, a room-number display, fingerprint-secured drawers and a friendly face.',
+    seoTitle: 'Hotel Delivery Robot — 3D Product Reveal',
+    seoDescription:
+      'Cinematic 3D product reveal of an autonomous hotel room-delivery robot: fog and light-beam reveal, room-number display, fingerprint-secured drawers and a friendly face.',
+    challenge:
+      'A delivery robot walks the same corridors as hotel guests. It had to look premium enough for luxury hotels while making its job — secure, room-to-room delivery — instantly clear.',
+    approach:
+      'The film opens in darkness, with fog and a single light beam sculpting the silhouette and its light strip. It then moves close: the display shows the destination room, the camera glides over fingerprint-secured drawers, and the face animates into a smile before a full reveal of the robot and a closing brand card.',
+    result:
+      'A 20-second vertical film built for launch campaigns, social media and hotel sales presentations — premium in tone, and clear about what the robot does.',
+    deliverables: ['Cinematic product reveal', 'Screen / UI animation', 'Feature close-ups'],
+    formats: ['9:16 vertical'],
+    media: [{ name: 'hotel-delivery-robot', aspect: 'portrait', width: 720, height: 1280, duration: 'PT20S' }],
+  },
 ];
 
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);

@@ -15,7 +15,7 @@ import { site } from '@/config/site';
 
 const latestPosts = (await getPosts()).slice(0, 2);
 
-const [p1, p2, p3, p4, p5, p6] = projects;
+const [p1, , p3, p4, p5, p6, p7] = projects;
 const hero = p1.media[0];
 const origin = originOf(Astro.site!);
 
@@ -121,7 +121,7 @@ const schema = [
 
     <div class="mt-14 grid gap-x-8 gap-y-14 md:grid-cols-12">
       <ProjectCard project={p1} mediaIndex={1} class="md:col-span-6 lg:col-span-5" />
-      <ProjectCard project={p2} class="md:col-span-6 lg:col-span-5 lg:col-start-8 lg:mt-40" />
+      <ProjectCard project={p7} class="md:col-span-6 lg:col-span-5 lg:col-start-8 lg:mt-40" />
       <ProjectCard project={p5} class="md:col-span-12 lg:col-span-7" frameClass="aspect-[16/10]" />
       <ProjectCard project={p3} class="md:col-span-6 lg:col-span-4 lg:col-start-9 lg:mt-24" />
       <ProjectCard project={p4} class="md:col-span-6 lg:col-span-4" />
