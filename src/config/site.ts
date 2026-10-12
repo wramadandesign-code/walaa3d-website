@@ -26,7 +26,7 @@ export const site = {
   // Shown as icons in the header + footer (SocialLinks.astro) and used as JSON-LD sameAs.
   // Order here = display order. Leave a value empty to hide it.
   social: {
-    instagram: 'https://www.instagram.com/walaadesign31/',
+    instagram: 'https://www.instagram.com/walaa_3d_product_animation/',
     tiktok: 'https://www.tiktok.com/@walaa3danimation',
     youtube: 'https://www.youtube.com/@walaa3danimation',
     linkedin: 'https://www.linkedin.com/company/walaa-3d-product-animation/',
